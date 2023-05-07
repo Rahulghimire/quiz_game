@@ -10,42 +10,49 @@
     <script src="<?php echo base_url().'assets/js/bootstrap.min.js'?>"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        
-          *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family: 'Roboto', sans-serif;
-        }
 
-        body{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            height:100vh;
-            background-color:skyblue;
-        }
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family: 'Roboto', sans-serif;
+    }
 
-        .trivia {
-        max-width:850px;
-        padding:30px;
-        background-color: white;
-        border-radius:10px;
-        }
+    body{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        background-image:url('http://localhost/quiz_game/assets/bg-gradient.avif');
+        background-position: center; 
+        background-repeat: no-repeat; 
+        background-size: cover;
+        animation: bg-animation 8s infinite;
+        animation-timing-function:ease-in-out;
+        animation-direction: alternate;
+    }
 
-        .question {
-        min-width:800px;
-        font-size: 20px;
-        font-weight: bold;
+    .trivia {
+        max-width: 850px;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .question {
+        min-width: 800px;
+        font-size: 24px;
+        font-weight: 600;
         margin-bottom: 30px;
-        }
+    }
 
-        .options{
+    .options{
         min-height:225px;
         min-width:300px;
-        }
+    }
 
-        .option {
+    .option {
         font-size: 16px;
         margin-bottom: 10px;
         padding: 10px;
@@ -54,36 +61,116 @@
         text-align: center;
         width: 90%;
         cursor:pointer;
-        }
+        transition: background-color 0.3s ease-in-out;
+    }
 
-        .button-group{
+    .button-group{
         display:flex;
         justify-content:space-between;
-        }
+    }
 
-        .form-header{
-            display:flex;
-            justify-content:space-between;
-            margin-bottom:10px;
-        }
-        .option:hover{
-            background-color:skyblue;
-        }
+    .form-header{
+        display:flex;
+        justify-content:space-between;
+        margin-bottom:10px;
+    }
 
-        @media screen and (max-width:900px){
+    .btn {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    }
+
+    .btn:hover {
+    opacity: 0.9;
+    }
+
+    .btn-info {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    }
+
+    .btn-info:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    }
+
+    .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+    }
+    
+    .btn-dark {
+    background-color: #343a40;
+    border-color: #343a40;
+    color: #fff;
+    }
+
+    .btn-dark:hover {
+    background-color: #23272b;
+    border-color: #1d2124;
+    }
+
+    .option:hover {
+    background-color: #e6f7ff;
+    }
+
+    .timer {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    }
+
+    .timer img {
+    margin-right: 5px;
+    opacity: 0.8;
+    }
+
+    @media screen and (max-width:900px){
         .trivia {
-        min-height:300px;
-        min-width:300px;
+            min-height:300px;
+            min-width:300px;
+            max-width:600px;
+            padding:15px;
+        }
+
+        .question {
+            font-size: 16px;
+            margin-bottom: 20px;
+            min-width: 300px;
         }
 
         .options{
-        min-height:225px;
-        min-width:200px;
+            min-height:150px;
+            min-width:200px;
         }
 
+        .option {
+            font-size: 14px;
+            margin-bottom: 5px;
+            padding: 8px;
+            width: 80%;
         }
+    }
 
-    </style>
+    @keyframes bg-animation {
+        0% {
+            background-image: url('http://localhost/quiz_game/assets/bg-gradient.avif');
+        }
+        50% {
+            background-image: url('http://localhost/quiz_game/assets/bg-3.avif');
+        }
+        100% {
+            background-image: url('http://localhost/quiz_game/assets/digi.avif');
+        }
+    }
+</style>
 </head>
 
 <body>
@@ -116,6 +203,7 @@
     let userScore = 0;
     let counter;
     let id=1;
+    //let id_Array=new Array(totalQuestions).fill(0);
     let selectedAnswer=[];
     let index=0;
     let timeStorage=[];
@@ -131,6 +219,7 @@
         console.log("success");
         console.log(response);
         localStorage.setItem('data'+id,JSON.stringify(response));
+        //id_Array[id-1]=response[0].q_id;
         },
 
         error:function(){
@@ -150,10 +239,10 @@
     startTimer(timeValue); 
     $('#submit').hide();
     $('#totalQuestions').html(totalQuestions);
-    showQuestions(1);
     }
 
     function showQuestions(id){
+
         const data=JSON.parse(localStorage.getItem('data'+id));
         options=JSON.parse(data[index].options);
         $('count').html(data[index].q_id);
@@ -181,7 +270,7 @@
 
         }
     }
-    
+
 
     function startTimer(time){
         $("#time").html(time);
@@ -208,15 +297,7 @@
         clearInterval(counter);
         startTimer(15); 
         $('#prev').show();
-
-        if (!localStorage.getItem("data"+id)){
-            getData(id);
-        }
-        
-        else{
-            showQuestions(id);
-        }
-
+        getData(id);
         const data=JSON.parse(localStorage.getItem('data'+id));
         options=JSON.parse(data[index].options);
         $('#count').html(data[index].q_id);
@@ -239,7 +320,7 @@
 
 
     prev.addEventListener("click",function(){
-
+        
         id--;
         const data=JSON.parse(localStorage.getItem('data'+id));
         options=JSON.parse(data[index].options);
