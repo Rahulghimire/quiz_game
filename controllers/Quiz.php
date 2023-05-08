@@ -41,13 +41,12 @@ class Quiz extends CI_Controller {
 		if(!$this->session->has_userdata('auth_user')){
 			redirect('Quiz/index');
 		}
-
 		$this->load->view("QuizView");
 
 	}
 
 	public function getData($id){
-
+		
 	$result = $this->Quiz_model->getQuestionOptions($id);
 
 	//var_dump($result);

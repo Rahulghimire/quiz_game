@@ -115,9 +115,6 @@
         background-color: #212121;
         color: white;
     }
-    .selected {
-    background-color: skyblue;
-    }
 
     @media screen and (max-width: 900px) {
         .trivia {
@@ -146,12 +143,9 @@
             padding: 8px 16px;
         }
     }
-
-    .disabled {
-    pointer-events: none;
-    opacity: 0.5; 
-    }
 </style>
+
+
 </head>
 
 <body>
@@ -177,26 +171,22 @@
 
 <script>
 
-    let totalQuestions=4;
-    let timeValue =  15;
-    let timeValues=new Array(totalQuestions).fill(15);
+    let totalQuestions = 4;
+    let timeValues = [15, 15, 15, 15]; // array of time values for each question
+    let que_count = 0;
+    let que_numb = 1;
     let userScore = 0;
     let counter;
-    let id=1;
-    let selectedAnswers=new Array(totalQuestions).fill(0);
-    console.log(selectedAnswers);
-    let index=0;
-    let timeStorage=new Array(totalQuestions).fill(0);
+    let id = 1;
+    let selectedAnswer = [];
+    let index = 0;
+    let timeStorage = [];
+    let timers = [];    
 
-    const next=document.querySelector("#next");
-    const prev=document.querySelector("#prev");
 
+    
+    
     function getData(id){
-        var data = localStorage.getItem('data'+id);
-    if(data){
-            showQuestions(id);
-    }
-    else{
         $.ajax({
         url:'<?php echo base_url().'index.php/Quiz/getData/'?>'+id,
         type:'post',
@@ -205,7 +195,7 @@
         success:function(response){
         console.log(response);
         localStorage.setItem('data'+id,JSON.stringify(response));
-        showQuestions(id);
+        //id_Array[id-1]=response[0].q_id;
         },
 
         error:function(){
@@ -216,132 +206,145 @@
         console.log("request completed");
         }
     });
-    }   
     }
 
-    function initializeApp(){
-    $('#prev').hide();
-    var data = localStorage.getItem('data' + id);
-    if(data) {
-        showQuestions(1);
-    } else {
-        getData(id);
-    }
-    startTimer(timeValues[0],id); 
-    $('#submit').hide();
-    $('#totalQuestions').html(totalQuestions);
-    }
+function initializeApp() {
+  $('#prev').hide();
+  getData(id);
+  showQuestions(1);
+  startTimer(timeValues[0], 0);
+  $('#submit').hide();
+  $('#totalQuestions').html(totalQuestions);
+}
 
     function showQuestions(id){
 
         const data=JSON.parse(localStorage.getItem('data'+id));
         options=JSON.parse(data[index].options);
-        $('#count').html(data[index].q_id);
-
-        var qid=data[index].q_id;
-
+        $('count').html(data[index].q_id);
         $('#que-text').html(data[index].question_text);
 
         for(i=0;i<options.length;i++){
         $('#option-'+i).html(options[i]);
         }
 
-        //Adds class to the selected option
-        if(selectedAnswers[id-1]) {
-            console.log(selectedAnswers[id-1]);
-            const selectedOption = options.indexOf(selectedAnswers[id-1]);
-            console.log("selected option::",selectedOption);
-            $('#option-'+selectedOption).addClass('selected');
-        }
 
         for (i = 0; i < options.length; i++) {
-        $('#option-' + i).removeClass('selected');
         $('#option-' + i).click(function() {
         let correctAns=data[index].correct_answer;
         const selectedOptionValue = $(this).text();
-        $('.option').removeClass('selected');
-        $(this).addClass('selected');
         optionSelected(selectedOptionValue,correctAns);
+        //$('.option').not(this).prop('disabled', true);
+
         });
        }  
     }
 
     function optionSelected(answer,corrAns){
-    if (answer) {
-        selectedAnswers[id-1]=answer;
-        console.log(selectedAnswers);
-        if(answer==corrAns){
-            console.log("answer corrected");
-            userScore+=10;
-        }
-    }
+        console.log(answer);
+        console.log(corrAns);
+        if(answer){
+            if (timeLeft === 0) {
+      $('.option').prop('disabled', true);
     }
 
-    function startTimer(time,id){
-    console.log(time,id);
-    $("#time").html(time);
-    timeLeft = time;
-    counter=setInterval(timer,1000);
-    function timer(){
-        if(timeLeft > 0){
-            $("#time").html(timeLeft);
-            timeLeft--;
-        }
-        else{
-            console.log(timeLeft);
-            $("#time").html("Time Off");
-            clearInterval(counter);
-            timeStorage.push(timeLeft);
-            //$('.options').addClass('disabled');
         }
     }
+
+
+    function startTimer(time, questionIndex) {
+  $("#time").html(time);
+  timeLeft = time;
+  timers[questionIndex] = setInterval(function() {
+    if (timeLeft > 0) {
+      timeLeft--;
+      $("#time").html(timeLeft);
+    } else {
+      $("#time").html("Time Off");
+      clearInterval(timers[questionIndex]);
+      timeStorage[questionIndex] = timeLeft;
+      $('.option').prop('disabled', true);
+    }
+  }, 1000);
 }
 
-    next.addEventListener("click",function(){
-        console.log(id);
-        timeStorage[id-1]=timeLeft;
-        console.log(timeStorage);
-        clearInterval(counter);
-        startTimer(timeValues[0],id); 
-        id++;
-    if(id === totalQuestions){
-        $('#next').hide();
-        $('#submit').show();
-        } 
-        
-     else {
-        $('#submit').hide();
-        $('#next').show();
-    }
-        $('#prev').show();
-        getData(id); 
 
-    if(selectedAnswers[id-1]) {
-            console.log(selectedAnswers[id-1]);
-            const selectedOption = options.indexOf(selectedAnswers[id-1]);
-            console.log("selected option::",selectedOption);
-            $('#option-'+selectedOption).addClass('selected');
-    }
-    });
+    const next=document.querySelector("#next");
+    const prev=document.querySelector("#prev");
 
-    prev.addEventListener("click",function(){
-    id--;
-    if (id === 1) {
-    $('#prev').hide();
-    } else {
-        $('#prev').show();
-    }
-    $('#next').show();
+    $('#next').click(function() {
+  clearInterval(timers[index]);
+  id++;
+  if (id === totalQuestions) {
+    $('#next').hide();
+    $('#submit').show();
+  } else {
     $('#submit').hide();
-    getData(id);
+    $('#next').show();
+  }
+  index++;
+  startTimer(timeValues[index], index);
+  $('#prev').show();
+  getData(id);
+  const data = JSON.parse(localStorage.getItem('data' + id));
+  options = JSON.parse(data[index].options);
+  $('#count').html(data[index].q_id);
+  $('#que-text').html(data[index].question_text);
 
-    if(selectedAnswers[id-1]) {
-            console.log(selectedAnswers[id-1]);
-            const selectedOption = options.indexOf(selectedAnswers[id-1]);
-            console.log("selected option::",selectedOption);
-            $('#option-'+selectedOption).addClass('selected');
-    }
+  for (i = 0; i < options.length; i++) {
+    $('#option-' + i).html(options[i]);
+  }
+
+  for (i = 0; i < options.length; i++) {
+    $('#option-' + i).click(function() {
+      let correctAns = data[index].correct_answer;
+      const selectedOptionValue = $(this).text();
+      optionSelected(selectedOptionValue, correctAns);
+      //$('.option').not(this).prop('disabled', true);
     });
+  }
+    });
+
+
+    prev.addEventListener("click", function() {     
+        clearInterval(timers[index]);
+  id--;
+  if (id === 1) {
+    $('#prev').hide();
+  } else {
+    $('#prev').show();
+  }
+  $('#next').show();
+  $('#submit').hide();
+  index--;
+  // Get the remaining time of the current timer
+  const remainingTime = $("#time").html();
+  // Show the previous question and its options
+  const data = JSON.parse(localStorage.getItem('data' + id));
+  options = JSON.parse(data[index].options);
+  $('#count').html(data[index].q_id);
+  $('#que-text').html(data[index].question_text);
+  for (i = 0; i < options.length; i++) {
+    $('#option-' + i).html(options[i]);
+  }
+  // Disable all options if time is 0
+  if (remainingTime === "Time Off") {
+    $('.option').prop('disabled', true);
+  } else {
+    // Resume the timer from the remaining time
+    startTimer(parseInt(remainingTime), index);
+  }
+
+    // Add event listeners to options
+    for (i = 0; i < options.length; i++) {
+        $('#option-' + i).click(function() {
+            let correctAns = data[index].correct_answer;
+            const selectedOptionValue = $(this).text();
+            optionSelected(selectedOptionValue, correctAns);
+        });
+    }
+});
+
 
     initializeApp();
 
