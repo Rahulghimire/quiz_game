@@ -6,7 +6,6 @@
     }
 
     public function getUsers($data){
-
         $this->db->where('email',$data['email']);
         $this->db->where('password',$data['password']);
         $this->db->where('role','admin');
@@ -20,7 +19,6 @@
         else{
             return false;
         }
-
     }
 
     public function getQuestionOptions($id){

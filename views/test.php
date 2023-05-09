@@ -80,7 +80,9 @@
     }
 
     .option:hover {
-        background-color: #f5f5f5;
+        /* background-color: #f5f5f5; */
+        background-color:black;
+        color:white;
     }
 
     .button-group {
@@ -115,6 +117,11 @@
         background-color: #212121;
         color: white;
     }
+    .selected {
+    /* background-color: skyblue; */
+    color:white;
+    background-color:black;
+    }
 
     @media screen and (max-width: 900px) {
         .trivia {
@@ -143,12 +150,39 @@
             padding: 8px 16px;
         }
     }
+
+    .disabled {
+    pointer-events: none;
+    opacity: 0.5; 
+    }
 </style>
-
-
 </head>
 
 <body>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Quiz Completed!!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <?php  $user=$this->session->userdata('auth_user');
+        $name=$user['name'];
+        ?>
+        <span><?php echo $name?> has scored:<span id="userscore"></span></span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="showPreview()">Go to Preview</button>
+        <button type="button" class="btn btn-primary" onclick="showResult()">View Result</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <div class="trivia">
     <div class="form-header">
     <div class="question-number my-1"><span class="text-dark">Question.</span><span id="count" class="fw-bolder text-success"> 1</span><span> of </span><span id="totalQuestions"></span></div>
@@ -164,29 +198,34 @@
         <div class="button-group">
         <button type="button" class="btn btn-info" id="prev">Previous</button>
         <button type="button" class="btn btn-success" id="next">Next</button>
-        <button type="button" class="btn btn-dark" id="submit">Submit</button>
+        <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#exampleModal">Submit</button>
         </div>
     </div>
 </body>
 
 <script>
-
-    let totalQuestions = 4;
-    let timeValues = [15, 15, 15, 15]; // array of time values for each question
-    let que_count = 0;
-    let que_numb = 1;
+    let totalQuestions=4;
+    // let timeValue =  15;
+    let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
-    let id = 1;
-    let selectedAnswer = [];
-    let index = 0;
-    let timeStorage = [];
-    let timers = [];    
+    let timeLeft;
+    let id=1;
+    let selectedAnswers=new Array(totalQuestions).fill(0);
+    console.log(selectedAnswers);
+    let index=0;
+    let timeStorage=new Array(totalQuestions).fill(0);
 
+    const next=document.querySelector("#next");
+    const prev=document.querySelector("#prev");
+    const submit=document.querySelector("#submit");
 
-    
-    
     function getData(id){
+        var data = localStorage.getItem('data'+id);
+    if(data){
+            showQuestions(id);
+    }
+    else{
         $.ajax({
         url:'<?php echo base_url().'index.php/Quiz/getData/'?>'+id,
         type:'post',
@@ -195,7 +234,7 @@
         success:function(response){
         console.log(response);
         localStorage.setItem('data'+id,JSON.stringify(response));
-        //id_Array[id-1]=response[0].q_id;
+        showQuestions(id);
         },
 
         error:function(){
@@ -206,150 +245,175 @@
         console.log("request completed");
         }
     });
+    }   
     }
 
-function initializeApp() {
-  $('#prev').hide();
-  getData(id);
-  showQuestions(1);
-  startTimer(timeValues[0], 0);
-  $('#submit').hide();
-  $('#totalQuestions').html(totalQuestions);
-}
+    function initializeApp(){
+    $('#prev').hide();
+    var data = localStorage.getItem('data' + id);
+    if(data) {
+        showQuestions(1);
+    } else {
+        getData(id);
+    }
+    startTimer(timeValues[0],id); 
+    $('#submit').hide();
+    $('#totalQuestions').html(totalQuestions);
+    }
 
     function showQuestions(id){
 
         const data=JSON.parse(localStorage.getItem('data'+id));
         options=JSON.parse(data[index].options);
-        $('count').html(data[index].q_id);
+        $('#count').html(data[index].q_id);
+
+        var qid=data[index].q_id;
+
         $('#que-text').html(data[index].question_text);
 
         for(i=0;i<options.length;i++){
         $('#option-'+i).html(options[i]);
         }
 
+        //Adds class to the selected option
+        if(selectedAnswers[id-1]) {
+            console.log(selectedAnswers[id-1]);
+            const selectedOption = options.indexOf(selectedAnswers[id-1]);
+            console.log("selected option::",selectedOption);
+            $('#option-'+selectedOption).addClass('selected');
+        }
 
         for (i = 0; i < options.length; i++) {
+        $('#option-' + i).removeClass('selected');
+
+
         $('#option-' + i).click(function() {
         let correctAns=data[index].correct_answer;
         const selectedOptionValue = $(this).text();
+        $('.option').removeClass('selected');
+        $(this).addClass('selected');
         optionSelected(selectedOptionValue,correctAns);
-        //$('.option').not(this).prop('disabled', true);
-
         });
        }  
     }
 
-    function optionSelected(answer,corrAns){
-        console.log(answer);
-        console.log(corrAns);
-        if(answer){
-            if (timeLeft === 0) {
-      $('.option').prop('disabled', true);
-    }
+    //Option Selected Function
 
+    function optionSelected(answer,corrAns){
+    if(answer) {
+        selectedAnswers[id-1]=answer;
+        console.log(selectedAnswers);
+        if(answer==corrAns){
+            userScore+=10;
+            console.log(userScore);
         }
     }
-
-
-    function startTimer(time, questionIndex) {
-  $("#time").html(time);
-  timeLeft = time;
-  timers[questionIndex] = setInterval(function() {
-    if (timeLeft > 0) {
-      timeLeft--;
-      $("#time").html(timeLeft);
-    } else {
-      $("#time").html("Time Off");
-      clearInterval(timers[questionIndex]);
-      timeStorage[questionIndex] = timeLeft;
-      $('.option').prop('disabled', true);
+    // localStorage.setItem("userscore",userScore);
     }
-  }, 1000);
+
+    function startTimer(time,id){
+    // console.log(time,id);
+    $("#time").html(time);
+    timeLeft = time;
+    
+    counter=setInterval(timer,1000);
+    function timer(){
+        if (timeLeft<= 0){
+            $('.options').addClass('disabled');
+            // $("#time").html("Time Off");
+        }
+        else if(timeLeft > 0){
+            $('.options').removeClass('disabled');
+            $("#time").html(timeLeft);
+            timeLeft--;
+        }
+        else{
+            clearInterval(counter);
+            $("#time").html("Time Off");
+            // $("#time").css('color','red');
+            timeStorage[id-1]=timeValues[id-1]-timeLeft;
+            timeValues[id-1]=timeLeft;
+            console.log("timeValues",timeValues);
+            // $('.options').addClass('disabled');
+        }
+    }
 }
 
 
-    const next=document.querySelector("#next");
-    const prev=document.querySelector("#prev");
+    next.addEventListener("click",function(){
+        clearInterval(counter);
+        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        timeValues[id-1]=timeLeft;
+        console.log(timeStorage);
+        id++;
+        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        startTimer(timeValues[id-1],id); 
+    if(id === totalQuestions){
+        $('#next').hide();
+        $('#submit').show();
+        } 
 
-    $('#next').click(function() {
-  clearInterval(timers[index]);
-  id++;
-  if (id === totalQuestions) {
-    $('#next').hide();
-    $('#submit').show();
-  } else {
-    $('#submit').hide();
-    $('#next').show();
-  }
-  index++;
-  startTimer(timeValues[index], index);
-  $('#prev').show();
-  getData(id);
-  const data = JSON.parse(localStorage.getItem('data' + id));
-  options = JSON.parse(data[index].options);
-  $('#count').html(data[index].q_id);
-  $('#que-text').html(data[index].question_text);
-
-  for (i = 0; i < options.length; i++) {
-    $('#option-' + i).html(options[i]);
-  }
-
-  for (i = 0; i < options.length; i++) {
-    $('#option-' + i).click(function() {
-      let correctAns = data[index].correct_answer;
-      const selectedOptionValue = $(this).text();
-      optionSelected(selectedOptionValue, correctAns);
-      //$('.option').not(this).prop('disabled', true);
-    });
-  }
-    });
-
-
-    prev.addEventListener("click", function() {     
-        clearInterval(timers[index]);
-  id--;
-  if (id === 1) {
-    $('#prev').hide();
-  } else {
-    $('#prev').show();
-  }
-  $('#next').show();
-  $('#submit').hide();
-  index--;
-  // Get the remaining time of the current timer
-  const remainingTime = $("#time").html();
-  // Show the previous question and its options
-  const data = JSON.parse(localStorage.getItem('data' + id));
-  options = JSON.parse(data[index].options);
-  $('#count').html(data[index].q_id);
-  $('#que-text').html(data[index].question_text);
-  for (i = 0; i < options.length; i++) {
-    $('#option-' + i).html(options[i]);
-  }
-  // Disable all options if time is 0
-  if (remainingTime === "Time Off") {
-    $('.option').prop('disabled', true);
-  } else {
-    // Resume the timer from the remaining time
-    startTimer(parseInt(remainingTime), index);
-  }
-
-    // Add event listeners to options
-    for (i = 0; i < options.length; i++) {
-        $('#option-' + i).click(function() {
-            let correctAns = data[index].correct_answer;
-            const selectedOptionValue = $(this).text();
-            optionSelected(selectedOptionValue, correctAns);
-        });
+     else {
+        $('#submit').hide();
+        $('#next').show();
     }
-});
+        $('#prev').show();
+        getData(id); 
 
+    if(selectedAnswers[id-1]) {
+            console.log(selectedAnswers[id-1]);
+            const selectedOption = options.indexOf(selectedAnswers[id-1]);
+            console.log("selected option::",selectedOption);
+            $('#option-'+selectedOption).addClass('selected');
+    }
+    });
+
+    prev.addEventListener("click",function(){
+    timeValues[id-1]=timeLeft;
+    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    clearInterval(counter);    
+
+    console.log(timeStorage);
+    id--;
+    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    startTimer(timeValues[id-1],id); 
+    if (id === 1) {
+    $('#prev').hide();
+    } else {
+        $('#prev').show();
+    }
+    $('#next').show();
+    $('#submit').hide();
+    getData(id);
+
+    if(selectedAnswers[id-1]) {
+            console.log(selectedAnswers[id-1]);
+            const selectedOption = options.indexOf(selectedAnswers[id-1]);
+            console.log("selected option::",selectedOption);
+            $('#option-'+selectedOption).addClass('selected');
+    }
+    });
+
+    submit.addEventListener("click",function(){
+        console.log("submit button clicked");
+        console.log(id);
+        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        console.log("timeStorage:",timeStorage);
+        console.log("timeValues:",timeValues);
+        localStorage.setItem("timeValues",JSON.stringify(timeValues));
+        localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
+        $("#userscore").html(userScore);
+    });
+
+    function showPreview(){
+        console.log("preview clicked");
+    }
+
+    function showResult(){
+        console.log("viewresult clicked");
+    }
 
     initializeApp();
-
-
+    
 </script>
-
-
 </html>

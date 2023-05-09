@@ -176,10 +176,9 @@
 </body>
 
 <script>
-
     let totalQuestions=4;
-    let timeValue =  15;
-    let timeValues=new Array(totalQuestions).fill(15);
+    // let timeValue =  15;
+    let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
     let id=1;
@@ -190,6 +189,7 @@
 
     const next=document.querySelector("#next");
     const prev=document.querySelector("#prev");
+    const submit=document.querySelector("#submit");
 
     function getData(id){
         var data = localStorage.getItem('data'+id);
@@ -291,24 +291,24 @@
             console.log(timeLeft);
             $("#time").html("Time Off");
             clearInterval(counter);
-            timeStorage.push(timeLeft);
+            timeStorage[id-1]=timeValues[id-1]-timeLeft;
+            console.log(timeStorage);
             //$('.options').addClass('disabled');
         }
     }
 }
 
     next.addEventListener("click",function(){
-        console.log(id);
-        timeStorage[id-1]=timeLeft;
-        console.log(timeStorage);
         clearInterval(counter);
+        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        console.log(timeStorage);
         startTimer(timeValues[0],id); 
         id++;
     if(id === totalQuestions){
         $('#next').hide();
         $('#submit').show();
         } 
-        
+
      else {
         $('#submit').hide();
         $('#next').show();
@@ -325,6 +325,10 @@
     });
 
     prev.addEventListener("click",function(){
+
+    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    console.log(timeStorage);
+
     id--;
     if (id === 1) {
     $('#prev').hide();
@@ -341,6 +345,16 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
+    startTimer(timeValues[0],id); 
+
+
+    });
+
+    submit.addEventListener("click",function(){
+        console.log("btn clicked");
+        console.log(id);
+        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        console.log(timeStorage);
     });
 
     initializeApp();
