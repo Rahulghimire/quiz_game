@@ -80,7 +80,9 @@
     }
 
     .option:hover {
-        background-color: #f5f5f5;
+        /* background-color: #f5f5f5; */
+        background-color:black;
+        color:white;
     }
 
     .button-group {
@@ -116,7 +118,9 @@
         color: white;
     }
     .selected {
-    background-color: skyblue;
+    /* background-color: skyblue; */
+    color:white;
+    background-color:black;
     }
 
     @media screen and (max-width: 900px) {
@@ -170,22 +174,46 @@
         <div class="button-group">
         <button type="button" class="btn btn-info" id="prev">Previous</button>
         <button type="button" class="btn btn-success" id="next">Next</button>
-        <button type="button" class="btn btn-dark" id="submit">Submit</button>
+        <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#exampleModal">Submit</button>
         </div>
     </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Quiz Completed!!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <?php  $user=$this->session->userdata('auth_user');
+        $name=$user['name'];
+        ?>
+        <span><?php echo $name?> has scored:<span id="userscore"></span></span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="showPreview()">Go to Preview</button>
+        <button type="button" class="btn btn-primary" onclick="viewResult()">View Result</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 
 <script>
     let totalQuestions=4;
-    // let timeValue =  15;
+    let timeValue =  10;
     let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
+    let timeLeft;
     let id=1;
     let selectedAnswers=new Array(totalQuestions).fill(0);
     console.log(selectedAnswers);
     let index=0;
-    let timeStorage=new Array(totalQuestions).fill(0);
+    var timeStorage=new Array(totalQuestions).fill(0);
 
     const next=document.querySelector("#next");
     const prev=document.querySelector("#prev");
@@ -256,6 +284,8 @@
 
         for (i = 0; i < options.length; i++) {
         $('#option-' + i).removeClass('selected');
+
+
         $('#option-' + i).click(function() {
         let correctAns=data[index].correct_answer;
         const selectedOptionValue = $(this).text();
@@ -266,44 +296,60 @@
        }  
     }
 
+    //Option Selected Function
+
     function optionSelected(answer,corrAns){
-    if (answer) {
+    if(answer) {
         selectedAnswers[id-1]=answer;
         console.log(selectedAnswers);
         if(answer==corrAns){
-            console.log("answer corrected");
             userScore+=10;
+            console.log(userScore);
         }
     }
+    // localStorage.setItem("userscore",userScore);
     }
 
     function startTimer(time,id){
-    console.log(time,id);
-    $("#time").html(time);
     timeLeft = time;
+    $("#time").html(time);
+    if (timeLeft === 0){
+            $('.options').addClass('disabled');
+            $("#time").html("Time Off");
+        }
     counter=setInterval(timer,1000);
     function timer(){
-        if(timeLeft > 0){
+        if (timeLeft === 0){
+            $('.options').addClass('disabled');
+            $("#time").html("Time Off");
+        }
+        else if(timeLeft > 0){
+            $('.options').removeClass('disabled');
             $("#time").html(timeLeft);
             timeLeft--;
         }
         else{
-            console.log(timeLeft);
-            $("#time").html("Time Off");
             clearInterval(counter);
-            timeStorage[id-1]=timeValues[id-1]-timeLeft;
-            console.log(timeStorage);
-            //$('.options').addClass('disabled');
+            $("#time").html("Time Off");
+            // $("#time").css('color','red');
+            timeStorage[id-1]=timeValue-timeLeft;
+            timeValues[id-1]=timeLeft;
+            console.log("timeValues",timeValues);
+            // $('.options').addClass('disabled');
         }
     }
 }
 
+
     next.addEventListener("click",function(){
         clearInterval(counter);
-        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        timeStorage[id-1]=timeValue-timeLeft;
+        timeValues[id-1]=timeLeft;
         console.log(timeStorage);
-        startTimer(timeValues[0],id); 
         id++;
+        timeStorage[id-1]=timeValue-timeLeft;
+        startTimer(timeValues[id-1],id); 
+
     if(id === totalQuestions){
         $('#next').hide();
         $('#submit').show();
@@ -325,11 +371,13 @@
     });
 
     prev.addEventListener("click",function(){
-
-    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    timeValues[id-1]=timeLeft;
+    timeStorage[id-1]=timeValue-timeLeft;
+    clearInterval(counter);    
     console.log(timeStorage);
-
     id--;
+    timeStorage[id-1]=timeValue-timeLeft;
+    startTimer(timeValues[id-1],id); 
     if (id === 1) {
     $('#prev').hide();
     } else {
@@ -345,22 +393,31 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
-    startTimer(timeValues[0],id); 
-
-
     });
 
     submit.addEventListener("click",function(){
-        console.log("btn clicked");
+        clearInterval(counter);
+        console.log("submit button clicked");
         console.log(id);
-        timeStorage[id-1]=timeValues[id-1]-timeLeft;
-        console.log(timeStorage);
+        timeStorage[id-1]=timeValue-timeLeft;
+        console.log("timeStorage:",timeStorage);
+        console.log("timeValues:",timeValues);
+        localStorage.setItem("timeValues", JSON.stringify(timeValues));
+        localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
+        $("#userscore").html(userScore);
     });
 
+    function showPreview(){
+        console.log("preview clicked");
+    }
+
+    function viewResult(){
+        console.log(timeStorage);
+        console.log("viewresult clicked");
+        console.log(x);
+    }
+
     initializeApp();
-
-
+    
 </script>
-
-
 </html>

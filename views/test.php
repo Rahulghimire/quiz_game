@@ -205,14 +205,14 @@
 
 <script>
     let totalQuestions=4;
-    // let timeValue =  15;
+    let timeValue =  10;
     let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
     let timeLeft;
     let id=1;
     let selectedAnswers=new Array(totalQuestions).fill(0);
-    console.log(selectedAnswers);
+    // console.log(selectedAnswers);
     let index=0;
     let timeStorage=new Array(totalQuestions).fill(0);
 
@@ -285,16 +285,14 @@
 
         for (i = 0; i < options.length; i++) {
         $('#option-' + i).removeClass('selected');
-
-
-        $('#option-' + i).click(function() {
-        let correctAns=data[index].correct_answer;
-        const selectedOptionValue = $(this).text();
-        $('.option').removeClass('selected');
-        $(this).addClass('selected');
-        optionSelected(selectedOptionValue,correctAns);
+        $('#option-' + i).one('click', function() {
+            let correctAns = data[index].correct_answer;
+            const selectedOptionValue = $(this).text();
+            $('.option').removeClass('selected');
+            $(this).addClass('selected');
+            optionSelected(selectedOptionValue, correctAns);
         });
-       }  
+        }  
     }
 
     //Option Selected Function
@@ -312,15 +310,17 @@
     }
 
     function startTimer(time,id){
-    // console.log(time,id);
-    $("#time").html(time);
     timeLeft = time;
-    
+    $("#time").html(time);
+    if (timeLeft === 0){
+            $('.options').addClass('disabled');
+            $("#time").html("Time Off");
+        }
     counter=setInterval(timer,1000);
     function timer(){
-        if (timeLeft<= 0){
+        if (timeLeft === 0){
             $('.options').addClass('disabled');
-            // $("#time").html("Time Off");
+            $("#time").html("Time Off");
         }
         else if(timeLeft > 0){
             $('.options').removeClass('disabled');
@@ -331,7 +331,7 @@
             clearInterval(counter);
             $("#time").html("Time Off");
             // $("#time").css('color','red');
-            timeStorage[id-1]=timeValues[id-1]-timeLeft;
+            timeStorage[id-1]=timeValue-timeLeft;
             timeValues[id-1]=timeLeft;
             console.log("timeValues",timeValues);
             // $('.options').addClass('disabled');
@@ -339,15 +339,15 @@
     }
 }
 
-
     next.addEventListener("click",function(){
         clearInterval(counter);
-        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        timeStorage[id-1]=timeValue-timeLeft;
         timeValues[id-1]=timeLeft;
         console.log(timeStorage);
         id++;
-        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        timeStorage[id-1]=timeValue-timeLeft;
         startTimer(timeValues[id-1],id); 
+
     if(id === totalQuestions){
         $('#next').hide();
         $('#submit').show();
@@ -370,12 +370,11 @@
 
     prev.addEventListener("click",function(){
     timeValues[id-1]=timeLeft;
-    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    timeStorage[id-1]=timeValue-timeLeft;
     clearInterval(counter);    
-
     console.log(timeStorage);
     id--;
-    timeStorage[id-1]=timeValues[id-1]-timeLeft;
+    timeStorage[id-1]=timeValue-timeLeft;
     startTimer(timeValues[id-1],id); 
     if (id === 1) {
     $('#prev').hide();
@@ -395,13 +394,16 @@
     });
 
     submit.addEventListener("click",function(){
+        clearInterval(counter);
         console.log("submit button clicked");
         console.log(id);
-        timeStorage[id-1]=timeValues[id-1]-timeLeft;
+        timeStorage[id-1]=timeValue-timeLeft;
         console.log("timeStorage:",timeStorage);
         console.log("timeValues:",timeValues);
+        console.log("selectedAnswers:",selectedAnswers);
         localStorage.setItem("timeValues",JSON.stringify(timeValues));
         localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
+        localStorage.setItem("selectedAnswers",JSON.stringify(selectedAnswers));
         $("#userscore").html(userScore);
     });
 
