@@ -118,9 +118,31 @@
         color: white;
     }
     .selected {
-    /* background-color: skyblue; */
     color:white;
     background-color:black;
+    }
+
+    .disabled {
+    pointer-events: none;
+    opacity: 0.5; 
+    }
+
+    .quit-quiz {
+    position: absolute;
+    top: 3rem;
+    right: 13.5rem;
+    background-color: #ff0000;
+    color: white;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    margin: 1rem 0 0;
+    cursor: pointer;
+}
+
+.quit-quiz:hover {
+        background-color:#cc0000;
     }
 
     @media screen and (max-width: 900px) {
@@ -150,16 +172,10 @@
             padding: 8px 16px;
         }
     }
-
-    .disabled {
-    pointer-events: none;
-    opacity: 0.5; 
-    }
 </style>
 </head>
 
 <body>
-
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -182,7 +198,9 @@
     </div>
   </div>
 </div>
-
+<div>
+<button class="quit-quiz">Quit Quiz</button>
+</div>
     <div class="trivia">
     <div class="form-header">
     <div class="question-number my-1"><span class="text-dark">Question.</span><span id="count" class="fw-bolder text-success"> 1</span><span> of </span><span id="totalQuestions"></span></div>
@@ -204,6 +222,7 @@
 </body>
 
 <script>
+
     let totalQuestions=4;
     let timeValue =  10;
     let timeValues=new Array(totalQuestions).fill(10);
@@ -309,6 +328,8 @@
     // localStorage.setItem("userscore",userScore);
     }
 
+    //Timer section starts here
+
     function startTimer(time,id){
     timeLeft = time;
     $("#time").html(time);
@@ -339,6 +360,9 @@
     }
 }
 
+    //Timer section ends here
+
+
     next.addEventListener("click",function(){
         clearInterval(counter);
         timeStorage[id-1]=timeValue-timeLeft;
@@ -368,6 +392,8 @@
     }
     });
 
+    //Previous button start here
+
     prev.addEventListener("click",function(){
     timeValues[id-1]=timeLeft;
     timeStorage[id-1]=timeValue-timeLeft;
@@ -393,18 +419,29 @@
     }
     });
 
+    //Previous button end here
+
+    setTimeout(function() {
+    next.click();
+    },10000);
+
     submit.addEventListener("click",function(){
         clearInterval(counter);
-        console.log("submit button clicked");
-        console.log(id);
         timeStorage[id-1]=timeValue-timeLeft;
-        console.log("timeStorage:",timeStorage);
-        console.log("timeValues:",timeValues);
-        console.log("selectedAnswers:",selectedAnswers);
         localStorage.setItem("timeValues",JSON.stringify(timeValues));
         localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
         localStorage.setItem("selectedAnswers",JSON.stringify(selectedAnswers));
         $("#userscore").html(userScore);
+
+        // let userData = JSON.parse(sessionStorage.getItem('user_data'));
+        console.log(selectedAnswers);
+
+        // userData={
+        //     user_id:userid,
+        //     totalQuestions:totalQuestions,
+
+        // };
+    
     });
 
     function showPreview(){
@@ -415,9 +452,6 @@
         console.log("viewresult clicked");
         console.log(timeValues);
         console.log(timeStorage);
-        
-        
-
     }
 
     initializeApp();

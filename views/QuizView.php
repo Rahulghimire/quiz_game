@@ -122,6 +122,39 @@
     color:white;
     background-color:black;
     }
+    .disabled {
+    pointer-events: none;
+    opacity: 0.5; 
+    }
+
+   .quit-quiz {
+    position: absolute;
+    top: 3rem;
+    right: 13.5rem;
+    background-color: #ff0000;
+    color: white;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.25rem;
+    margin: 1rem 0 0;
+    cursor: pointer;
+  }
+
+    .quit-quiz:hover {
+        background-color:#cc0000;
+    }
+
+    #user-id{
+        display:none;
+    }
+    #viewResultModal{
+        /* background-color:seashell;*/
+        background-color: #eff3fa;
+    }
+    .view-content{
+        border: none !important;
+    }
 
     @media screen and (max-width: 900px) {
         .trivia {
@@ -150,15 +183,10 @@
             padding: 8px 16px;
         }
     }
-
-    .disabled {
-    pointer-events: none;
-    opacity: 0.5; 
-    }
 </style>
 </head>
-
 <body>
+<button class="quit-quiz">Quit Quiz</button>
     <div class="trivia">
     <div class="form-header">
     <div class="question-number my-1"><span class="text-dark">Question.</span><span id="count" class="fw-bolder text-success"> 1</span><span> of </span><span id="totalQuestions"></span></div>
@@ -174,37 +202,85 @@
         <div class="button-group">
         <button type="button" class="btn btn-info" id="prev">Previous</button>
         <button type="button" class="btn btn-success" id="next">Next</button>
-        <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#exampleModal">Submit</button>
+        <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#submitModal">Submit</button>
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- -------------Submit Modal--------- -->
+<div class="modal fade" id="submitModal" tabindex="-1" role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Quiz Completed!!</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
+          <!-- <span aria-hidden="false">&times;</span> -->
         </button>
       </div>
       <div class="modal-body" id="modal-body">
         <?php  $user=$this->session->userdata('auth_user');
         $name=$user['name'];
+        $id=$user['id'];
         ?>
-        <span><?php echo $name?> has scored:<span id="userscore"></span></span>
+        <span><?php echo $name?><span id="user-id"><?php echo $id?></span> has scored:<span id="userscore"></span></span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="showPreview()">Go to Preview</button>
-        <button type="button" class="btn btn-primary" onclick="viewResult()">View Result</button>
+        <button type="button" class="btn btn-primary" id="view-result" onclick="viewResult()">View Result</button>
       </div>
     </div>
   </div>
 </div>
+
+<!-- ------------View Result Modal---------- -->
+<div class="modal fade" id="viewResultModal" tabindex="-1" role="dialog" aria-labelledby="viewResultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content view-content">
+      <div class="modal-header view-content">
+        <h5 class="modal-title" id="exampleModalLabel">User Result : <span class="font-weight-bold"><?php echo $name?></span></h5>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> -->
+      </div>
+      <div class="modal-body">
+<div class="table-responsive-sm table-responsive-md">
+<table class="table table-striped">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Total Questions</th>
+      <th scope="col">Attempted Questions</th>
+      <th scope="col">Correct Questions</th>
+      <th scope="col">Total Time Taken</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" id="userid"></th>
+      <td id="total-questions"></td>
+      <td id="attempted-questions"></td>
+      <td id="correct-questions"></td>
+      <td><span id="total-timetaken"></span>secs</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+      </div>
+      <div class="modal-footer view-content">
+      <button type="button" class="btn btn-danger px-4"><a class="text-decoration-none text-white" href="<?php base_url()?>logout">Logout</a></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 
 <script>
+    let previewStatus=false;
     let totalQuestions=4;
     let timeValue =  10;
+    let totalTimetaken;
+    let count = 0;
+    let uid;
     let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
@@ -266,7 +342,7 @@
         options=JSON.parse(data[index].options);
         $('#count').html(data[index].q_id);
 
-        var qid=data[index].q_id;
+        //var qid=data[index].q_id;
 
         $('#que-text').html(data[index].question_text);
 
@@ -303,7 +379,7 @@
         selectedAnswers[id-1]=answer;
         console.log(selectedAnswers);
         if(answer==corrAns){
-            userScore+=10;
+            userScore+=1;
             console.log(userScore);
         }
     }
@@ -340,7 +416,6 @@
     }
 }
 
-
     next.addEventListener("click",function(){
         clearInterval(counter);
         timeStorage[id-1]=timeValue-timeLeft;
@@ -368,6 +443,7 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
+
     });
 
     prev.addEventListener("click",function(){
@@ -393,28 +469,86 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
+
     });
+
 
     submit.addEventListener("click",function(){
         clearInterval(counter);
         console.log("submit button clicked");
         console.log(id);
         timeStorage[id-1]=timeValue-timeLeft;
-        console.log("timeStorage:",timeStorage);
-        console.log("timeValues:",timeValues);
         localStorage.setItem("timeValues", JSON.stringify(timeValues));
         localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
+        localStorage.setItem("selectedAnswers",JSON.stringify(selectedAnswers));
         $("#userscore").html(userScore);
+        var userId = $("#user-id").text();
+        console.log(userId);
+        uid = parseInt(userId);
+        totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
+
+       
+        for (let i = 0; i < selectedAnswers.length; i++) {
+        if (selectedAnswers[i] !== 0) {
+            count++;
+        }
+        }
+
+        const data={
+            user_id:uid,
+            totalQuestions:totalQuestions,
+            attempted_questions:count,
+            correct_questions:userScore,
+            total_time_taken:totalTimetaken,
+        };
+
+        localStorage.setItem("resultData",JSON.stringify(data));
+
+        //console.log(data);
+
+        $.ajax({
+        url:'<?php echo base_url().'index.php/Quiz/resultController'?>',
+        type:'post',
+        data:data,
+        dataType:'json',
+        success:function(response){
+        console.log(response);
+        },
+
+        error:function(){
+        console.log("error");
+        },
+
+        complete:function(){
+        console.log("request completed");
+        }
+    }); 
+
+    $("#submitModal").show();
+
     });
 
     function showPreview(){
         console.log("preview clicked");
+        
+
     }
 
     function viewResult(){
-        console.log(timeStorage);
+        console.log("timeStorage:",timeStorage);
+        console.log("timeValues:",timeValues);
+        console.log("selectedAnswers:",selectedAnswers);
         console.log("viewresult clicked");
-        console.log(x);
+        $("#submitModal").hide();
+        $("#viewResultModal").show();
+        $('#viewResultModal').removeClass('fade');
+        const resultData=JSON.parse(localStorage.getItem("resultData"));
+        console.log(resultData);
+        $('#userid').html(resultData.user_id);
+        $('#total-questions').html(resultData.totalQuestions);
+        $('#attempted-questions').html(resultData.attempted_questions);
+        $('#correct-questions').html(resultData.correct_questions);
+        $('#total-timetaken').html(resultData.total_time_taken);
     }
 
     initializeApp();

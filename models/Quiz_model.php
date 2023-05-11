@@ -2,7 +2,9 @@
  class Quiz_model extends CI_Model{
   
     public function insertUser($data){
-     return $this->db->insert('users',$data);
+      $this->db->insert('users',$data);
+     return $this->db->insert_id();
+
     }
 
     public function getUsers($data){
@@ -34,6 +36,9 @@
 		//var_dump($result);
 
     }
-
+    public function userResultInsert($data){
+        $this->db->insert('user_result', $data);
+        return $this->db->insert_id();
+    }
 
  }

@@ -7,16 +7,13 @@ class RegisterController extends CI_Controller{
     }
 
     public function register(){
-
-        $this->form_validation->set_rules('name','Name','required|min_length[5]|max_length[20]|trim');
+        $this->form_validation->set_rules('name','Name','required|min_length[5]|max_length[20]|regex_match[/^[a-zA-Z0-9 ]+$/]|trim');
         $this->form_validation->set_rules('email','Email','trim|required|valid_email');
         $this->form_validation->set_rules('password','Password','trim|required');
-        //$this->form_validation->set_rules('passconf', 'Password Confirmation', 'required');
 
-        if($this->form_validation->run()==false){
+        if($this->form_validation->run()===false){
             $this->index();
         }
-
         else{
             $data=array(
                 'name'=>$this->input->post('name'),
@@ -24,15 +21,15 @@ class RegisterController extends CI_Controller{
                 'password'=>md5($this->input->post("password"))
             );
 
-            $user=$this->Quiz_model->insertUser($data);
+            $id=$this->Quiz_model->insertUser($data);
 
-            if(!$user){
+            if(!$id){
                 $this->session->set_flashdata("failed","Invalid Credentials");
                 $this->index();
             }
 
             else{
-
+                $data['id']=$id;
                 $this->session->set_userdata("auth_user",$data);
                 $this->session->set_flashdata("success","Records Inserted Successfully");
                 redirect('Quiz/userDashboard');
