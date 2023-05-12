@@ -183,10 +183,34 @@
             padding: 8px 16px;
         }
     }
+    .green{
+        background-color:green !important;
+    }
+    
+    .red{
+        background-color:red !important;
+    }
+    .blue{
+        background-color:blue !important;
+    }
+    .modal-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-transform: capitalize;
+    }
+
+    .modal-title span {
+    color: #007bff;
+    }
+    
 </style>
 </head>
 <body>
-<button class="quit-quiz">Quit Quiz</button>
+<!-- --------------Main Quiz View starts here---------- -->
+
+<button class="quit-quiz" id="quit-quiz" onclick="quitQuiz();"><a class="text-decoration-none text-white" href="<?php base_url()?>logout">Quit Quiz</a></button>
+<button class="quit-quiz" id="logout" onclick="localStorage.clear();"><a class="text-decoration-none text-white" href="<?php base_url()?>logout">Logout</a></button>
     <div class="trivia">
     <div class="form-header">
     <div class="question-number my-1"><span class="text-dark">Question.</span><span id="count" class="fw-bolder text-success"> 1</span><span> of </span><span id="totalQuestions"></span></div>
@@ -205,15 +229,14 @@
         <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#submitModal">Submit</button>
         </div>
     </div>
+<!-- --------------Main Quiz View ends here---------- -->
 
-<!-- -------------Submit Modal--------- -->
+<!-- -------------Submit Modal starts here--------- -->
 <div class="modal fade" id="submitModal" tabindex="-1" role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Quiz Completed!!</h5>
-        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
-          <!-- <span aria-hidden="false">&times;</span> -->
         </button>
       </div>
       <div class="modal-body" id="modal-body">
@@ -230,16 +253,14 @@
     </div>
   </div>
 </div>
+<!-- -------------Submit Modal ends here--------- -->
 
-<!-- ------------View Result Modal---------- -->
+<!-- ------------View Result Modal starts here---------- -->
 <div class="modal fade" id="viewResultModal" tabindex="-1" role="dialog" aria-labelledby="viewResultModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content view-content">
       <div class="modal-header view-content">
-        <h5 class="modal-title" id="exampleModalLabel">User Result : <span class="font-weight-bold"><?php echo $name?></span></h5>
-        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button> -->
+        <h5 class="modal-title" id="vieResultModalLabel">User Result : <span class="font-weight-bold"><?php echo $name?></span></h5>
       </div>
       <div class="modal-body">
 <div class="table-responsive-sm table-responsive-md">
@@ -266,16 +287,17 @@
 </div>
       </div>
       <div class="modal-footer view-content">
-      <button type="button" class="btn btn-danger px-4"><a class="text-decoration-none text-white" href="<?php base_url()?>logout">Logout</a></button>
+      <button type="button" class="btn btn-danger px-4" onclick="localStorage.clear();"><a class="text-decoration-none text-white" href="<?php base_url()?>logout">Logout</a></button>
       </div>
     </div>
   </div>
 </div>
+<!-- ------------View Result Modal ends here---------- -->
 
 </body>
 
 <script>
-    let previewStatus=false;
+    var previewStatus=false;
     let totalQuestions=4;
     let timeValue =  10;
     let totalTimetaken;
@@ -325,13 +347,17 @@
 
     function initializeApp(){
     $('#prev').hide();
+    $('#logout').hide();
+
     var data = localStorage.getItem('data' + id);
     if(data) {
         showQuestions(1);
     } else {
         getData(id);
     }
+    if(!previewStatus){
     startTimer(timeValues[0],id); 
+    }
     $('#submit').hide();
     $('#totalQuestions').html(totalQuestions);
     }
@@ -342,49 +368,63 @@
         options=JSON.parse(data[index].options);
         $('#count').html(data[index].q_id);
 
-        //var qid=data[index].q_id;
-
         $('#que-text').html(data[index].question_text);
 
         for(i=0;i<options.length;i++){
         $('#option-'+i).html(options[i]);
         }
 
-        //Adds class to the selected option
-        if(selectedAnswers[id-1]) {
-            console.log(selectedAnswers[id-1]);
-            const selectedOption = options.indexOf(selectedAnswers[id-1]);
-            console.log("selected option::",selectedOption);
-            $('#option-'+selectedOption).addClass('selected');
+    //Adds class to the selected option
+    if(selectedAnswers[id - 1]) {
+    const selectedOption = options.indexOf(selectedAnswers[id - 1]);
+    $('.option').removeClass('selected green red blue');
+    $('#option-' + selectedOption).addClass('selected');
+    if (previewStatus) {
+        const correctAns = data[index].correct_answer;
+        if (selectedAnswers[id - 1] === correctAns) {
+            $('#option-' + selectedOption).addClass('green');
+        } else {
+            $('#option-' + selectedOption).addClass('red');
+            const correctOption = options.indexOf(correctAns);
+            $('#option-' + correctOption).addClass('green');
         }
+    }
+  }
+  else if (previewStatus) {
+    const selectedOption = options.indexOf(selectedAnswers[id - 1]);
+    $('.option').removeClass('selected green red blue');
+    $('#option-' + selectedOption).addClass('selected');
+    const correctAns = data[index].correct_answer;
+    const correctOption = options.indexOf(correctAns);
+    $('#option-' + correctOption).addClass('blue');
+}
 
-        for (i = 0; i < options.length; i++) {
+    for (i = 0; i < options.length; i++) {
         $('#option-' + i).removeClass('selected');
-
-
-        $('#option-' + i).click(function() {
-        let correctAns=data[index].correct_answer;
-        const selectedOptionValue = $(this).text();
-        $('.option').removeClass('selected');
-        $(this).addClass('selected');
-        optionSelected(selectedOptionValue,correctAns);
+        $('#option-' + i).one('click', function() {
+            let correctAns = data[index].correct_answer;
+            const selectedOptionValue = $(this).text();
+            $('.option').removeClass('selected');
+            $(this).addClass('selected');
+            optionSelected(selectedOptionValue, correctAns);
         });
-       }  
+        }  
     }
 
-    //Option Selected Function
+    //Option Selected Function starts here-------------------
 
-    function optionSelected(answer,corrAns){
-    if(answer) {
-        selectedAnswers[id-1]=answer;
+    function optionSelected(answer, corrAns) {
+        console.log(answer, corrAns);
+    if (answer) {
+        selectedAnswers[id - 1] = answer;
         console.log(selectedAnswers);
-        if(answer==corrAns){
-            userScore+=1;
-            console.log(userScore);
+        if (answer == corrAns) {
+        userScore += 1;
         }
     }
-    // localStorage.setItem("userscore",userScore);
     }
+
+    // Timer function starts here----------------
 
     function startTimer(time,id){
     timeLeft = time;
@@ -416,6 +456,8 @@
     }
 }
 
+    // Next function starts here----------------
+
     next.addEventListener("click",function(){
         clearInterval(counter);
         timeStorage[id-1]=timeValue-timeLeft;
@@ -423,11 +465,15 @@
         console.log(timeStorage);
         id++;
         timeStorage[id-1]=timeValue-timeLeft;
-        startTimer(timeValues[id-1],id); 
-
+        if(!previewStatus){
+            startTimer(timeValues[id-1],id); 
+        }
     if(id === totalQuestions){
         $('#next').hide();
         $('#submit').show();
+        if(previewStatus){
+        $('#submit').hide();
+        }
         } 
 
      else {
@@ -443,8 +489,9 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
-
     });
+
+    // Previous function starts here----------------
 
     prev.addEventListener("click",function(){
     timeValues[id-1]=timeLeft;
@@ -453,7 +500,9 @@
     console.log(timeStorage);
     id--;
     timeStorage[id-1]=timeValue-timeLeft;
+    if(!previewStatus){
     startTimer(timeValues[id-1],id); 
+    }
     if (id === 1) {
     $('#prev').hide();
     } else {
@@ -472,6 +521,7 @@
 
     });
 
+    // Submit function starts here----------------
 
     submit.addEventListener("click",function(){
         clearInterval(counter);
@@ -486,7 +536,6 @@
         console.log(userId);
         uid = parseInt(userId);
         totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
-
        
         for (let i = 0; i < selectedAnswers.length; i++) {
         if (selectedAnswers[i] !== 0) {
@@ -528,11 +577,67 @@
 
     });
 
-    function showPreview(){
-        console.log("preview clicked");
-        
+    // Quit Quiz function starts here-----------------
+
+    function quitQuiz(){
+        console.log("quit quiz clicked");
+        // console.log(data);
+        totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
+
+        for (let i = 0; i < selectedAnswers.length; i++) {
+        if (selectedAnswers[i] !== 0) {
+            count++;
+        }
+        }
+        var userId = $("#user-id").text();
+        uid = parseInt(userId);
+
+        const data={
+            user_id:uid,
+            totalQuestions:totalQuestions,
+            attempted_questions:count,
+            correct_questions:userScore,
+            total_time_taken:totalTimetaken,
+        };
+
+        $.ajax({
+        url:'<?php echo base_url().'index.php/Quiz/resultController'?>',
+        type:'post',
+        data:data,
+        dataType:'json',
+        success:function(response){
+        console.log(response);
+        },
+
+        error:function(){
+        console.log("error");
+        },
+
+        complete:function(){
+        console.log("request completed");
+        }
+    }); 
+    localStorage.clear();
 
     }
+
+    // Preview function starts here----------------
+
+    function showPreview(){
+        $('#submitModal').hide();
+        $('.modal-backdrop').removeClass('modal-backdrop');
+        console.log("preview clicked");
+        previewStatus=true;
+        $('#quit-quiz').hide();
+        $('#logout').show();
+        // clearInterval(counter);
+        $('#time').addClass('disabled');
+        $('.options').addClass('disabled');
+        $('#submit').hide();
+        showQuestions(id);
+    }
+
+    // ViewResult function starts here----------------
 
     function viewResult(){
         console.log("timeStorage:",timeStorage);
@@ -543,13 +648,15 @@
         $("#viewResultModal").show();
         $('#viewResultModal').removeClass('fade');
         const resultData=JSON.parse(localStorage.getItem("resultData"));
-        console.log(resultData);
+        // console.log(resultData);
         $('#userid').html(resultData.user_id);
         $('#total-questions').html(resultData.totalQuestions);
         $('#attempted-questions').html(resultData.attempted_questions);
         $('#correct-questions').html(resultData.correct_questions);
         $('#total-timetaken').html(resultData.total_time_taken);
     }
+
+    //Quiz App is initialized here----------------
 
     initializeApp();
     
