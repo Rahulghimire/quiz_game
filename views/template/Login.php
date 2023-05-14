@@ -40,8 +40,7 @@
                   </button></div>';
                 }
             ?>
-                <form action="<?php echo base_url()?>index.php/Auth/AdminController/login" method="post">
-
+                <form action="<?php echo base_url()?>index.php/AdminController/login" method="post">
                   <div class="d-flex align-items-center mb-3 pb-1">
                     <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
                     <span class="h1 fw-bold mb-0">Logo</span>
@@ -51,7 +50,7 @@
 
                   <div class="form-outline mb-2">
                     <small class="text-danger"><?php echo form_error("name")?></small>
-                    <input type="text" id="name" class="form-control form-control-lg" name="name" placeholder="Ram Kumar Phuyal" value=""/>
+                    <input type="text" id="name" class="form-control form-control-lg" name="name" placeholder="Admin Name" value=""/>
                     <label class="form-label" for="form2Example17">Enter Your Name</label>
                   </div>
 

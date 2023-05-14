@@ -6,12 +6,16 @@
         $this->load->model("Quiz_model");
     }
 
+    public function index(){
+		$this->load->view("template/Login");
+    }
+
     public function login(){
 
         $this->form_validation->set_rules('email','Email','trim|required|valid_email');
         $this->form_validation->set_rules('password','Password','trim|required');
 
-        if($this->form_validation->run()==false){
+        if($this->form_validation->run()===false){
             $this->index();
         }
 
@@ -32,19 +36,14 @@
                     'email'=>$result->email,
                 ];
 
-                $this->session->set_userdata('auth_user',$auth_user);
-
-                $this->session->set_flashdata("success","Records Inserted Successfully");
-            
-              redirect('Quiz/adminDashboard');
-                
+                $this->session->set_userdata('auth_admin',$auth_user);
+                $this->session->set_flashdata("success","Logged In Successfully");
+              redirect('Admin');   
             }
 
             else{
-
             $this->session->set_flashdata("failed","Invalid Credentials");
             $this->index();
-
             }
 
         }

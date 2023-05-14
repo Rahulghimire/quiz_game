@@ -6,6 +6,10 @@ class RegisterController extends CI_Controller{
         $this->load->model("Quiz_model");
     }
 
+    public function index(){
+        $this->load->view("template/Register");
+    }
+
     public function register(){
         $this->form_validation->set_rules('name','Name','required|min_length[5]|max_length[20]|regex_match[/^[a-zA-Z0-9 ]+$/]|trim');
         $this->form_validation->set_rules('email','Email','trim|required|valid_email');

@@ -5,206 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Application</title>
-    <link rel="stylesheet" href="<?php echo base_url().'assets/css/bootstrap.min.css'?>">
-    <script type="text/javascript" src="<?php echo base_url().'assets/jquery-3.6.4.js'?>"></script>
-    <script src="<?php echo base_url().'assets/js/bootstrap.min.js'?>"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background-color: #f5f5f5;
-    }
-
-    .trivia {
-        width: 850px;
-        max-width: 90%;
-        padding: 30px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
-    }
-
-    .form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .question-number {
-        font-weight: bold;
-        color: #3f51b5;
-    }
-
-    .timer {
-        display: flex;
-        align-items: center;
-        opacity:0.8;
-    }
-
-    .timer img {
-        margin-right: 5px;
-    }
-
-    .question {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-
-    .options {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .option {
-        font-size: 18px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        text-align: center;
-        cursor: pointer;
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .option:hover {
-        /* background-color: #f5f5f5; */
-        background-color:black;
-        color:white;
-    }
-
-    .button-group {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .btn {
-        font-size: 18px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .btn:hover {
-        background-color: #3f51b5;
-        color: white;
-    }
-
-    .btn-info {
-        background-color: #2196f3;
-        color: white;
-    }
-
-    .btn-success {
-        background-color: #4caf50;
-        color: white;
-    }
-
-    .btn-dark {
-        background-color: #212121;
-        color: white;
-    }
-    .selected {
-    /* background-color: skyblue; */
-    color:white;
-    background-color:black;
-    }
-    .disabled {
-    pointer-events: none;
-    opacity: 0.5; 
-    }
-
-   .quit-quiz {
-    position: absolute;
-    top: 3rem;
-    right: 13.5rem;
-    background-color: #ff0000;
-    color: white;
-    font-size: 1rem;
-    padding: 0.5rem 1.5rem;
-    border: none;
-    border-radius: 0.25rem;
-    margin: 1rem 0 0;
-    cursor: pointer;
-  }
-
-    .quit-quiz:hover {
-        background-color:#cc0000;
-    }
-
-    #user-id{
-        display:none;
-    }
-    #viewResultModal{
-        /* background-color:seashell;*/
-        background-color: #eff3fa;
-    }
-    .view-content{
-        border: none !important;
-    }
-
-    @media screen and (max-width: 900px) {
-        .trivia {
-            max-width: 600px;
-            padding: 15px;
-        }
-
-        .question {
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .options {
-            grid-template-columns: repeat(1, 1fr);
-            grid-gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .option {
-            font-size: 16px;
-            padding: 8px;
-        }
-
-        .btn {
-            font-size: 16px;
-            padding: 8px 16px;
-        }
-    }
-    .green{
-        background-color:green !important;
-    }
-    
-    .red{
-        background-color:red !important;
-    }
-    .blue{
-        background-color:blue !important;
-    }
-    .modal-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    text-transform: capitalize;
-    }
-
-    .modal-title span {
-    color: #007bff;
-    }
-    
-</style>
+    <?php include('header.php'); ?>
 </head>
 <body>
 <!-- --------------Main Quiz View starts here---------- -->
@@ -229,6 +30,8 @@
         <button type="button" class="btn btn-dark" id="submit" data-toggle="modal" data-target="#submitModal">Submit</button>
         </div>
     </div>
+<button type="button" class="btn btn-primary view-result" id="view-result" onclick="viewResult()">View Result</button>
+    
 <!-- --------------Main Quiz View ends here---------- -->
 
 <!-- -------------Submit Modal starts here--------- -->
@@ -259,8 +62,8 @@
 <div class="modal fade" id="viewResultModal" tabindex="-1" role="dialog" aria-labelledby="viewResultModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content view-content">
-      <div class="modal-header view-content">
-        <h5 class="modal-title" id="vieResultModalLabel">User Result : <span class="font-weight-bold"><?php echo $name?></span></h5>
+      <div class="modal-header view-content justify-content-start align-items-center">
+        <img src="<?php echo base_url().'assets/user.png'?>" alt="avatar" width="20" height="20"><h5 class="modal-title px-1" id="vieResultModalLabel">User Result : <span class="font-weight-bold text-danger"><?php echo $name?></span></h5>
       </div>
       <div class="modal-body">
 <div class="table-responsive-sm table-responsive-md">
@@ -293,22 +96,25 @@
   </div>
 </div>
 <!-- ------------View Result Modal ends here---------- -->
-
 </body>
 
 <script>
     var previewStatus=false;
     let totalQuestions=4;
     let timeValue =  10;
+    var isCorrectAnswerSelected = false;
     let totalTimetaken;
     let count = 0;
     let uid;
+    var dateTimeString;
     let timeValues=new Array(totalQuestions).fill(10);
     let userScore = 0;
     let counter;
     let timeLeft;
     let id=1;
     let selectedAnswers=new Array(totalQuestions).fill(0);
+    let correctAnswers=new Array(totalQuestions).fill(0);
+    let questions=new Array(totalQuestions).fill(0);
     console.log(selectedAnswers);
     let index=0;
     var timeStorage=new Array(totalQuestions).fill(0);
@@ -345,9 +151,28 @@
     }   
     }
 
+    function generateBeginDateTime(){
+    var now=new Date();
+    console.log(now);
+    var year = now.getFullYear();
+    var month = now.getMonth() + 1; 
+    var day = now.getDate();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var second = now.getSeconds();
+    dateTimeString = year + '-' + padNumber(month) + '-' + padNumber(day) + ' ' + padNumber(hour) + ':' + padNumber(minute) + ':' + padNumber(second);
+    function padNumber(num) {
+    return (num < 10 ? '0' : '') + num;
+    }
+    }
+
     function initializeApp(){
+    $('#view-result').hide();
     $('#prev').hide();
     $('#logout').hide();
+    
+    generateBeginDateTime();
+    console.log(dateTimeString);
 
     var data = localStorage.getItem('data' + id);
     if(data) {
@@ -363,9 +188,16 @@
     }
 
     function showQuestions(id){
-
         const data=JSON.parse(localStorage.getItem('data'+id));
+        console.log(data);
         options=JSON.parse(data[index].options);
+        questions[id-1]=data[index].question_text;
+        correctAnswers[id-1]=data[index].correct_answer;
+
+        console.log("correct answer",correctAnswers);
+        console.log("question",questions);
+
+
         $('#count').html(data[index].q_id);
 
         $('#que-text').html(data[index].question_text);
@@ -375,6 +207,7 @@
         }
 
     //Adds class to the selected option
+
     if(selectedAnswers[id - 1]) {
     const selectedOption = options.indexOf(selectedAnswers[id - 1]);
     $('.option').removeClass('selected green red blue');
@@ -397,7 +230,7 @@
     const correctAns = data[index].correct_answer;
     const correctOption = options.indexOf(correctAns);
     $('#option-' + correctOption).addClass('blue');
-}
+    }
 
     for (i = 0; i < options.length; i++) {
         $('#option-' + i).removeClass('selected');
@@ -418,8 +251,9 @@
     if (answer) {
         selectedAnswers[id - 1] = answer;
         console.log(selectedAnswers);
-        if (answer == corrAns) {
+        if (answer == corrAns && !isCorrectAnswerSelected) {
         userScore += 1;
+        isCorrectAnswerSelected = true;
         }
     }
     }
@@ -467,15 +301,17 @@
         timeStorage[id-1]=timeValue-timeLeft;
         if(!previewStatus){
             startTimer(timeValues[id-1],id); 
-        }
-    if(id === totalQuestions){
+        }else{
+        $('#time').html("Time Off");
+        clearInterval(counter);
+       }
+       if(id === totalQuestions){
         $('#next').hide();
         $('#submit').show();
         if(previewStatus){
         $('#submit').hide();
         }
         } 
-
      else {
         $('#submit').hide();
         $('#next').show();
@@ -502,6 +338,9 @@
     timeStorage[id-1]=timeValue-timeLeft;
     if(!previewStatus){
     startTimer(timeValues[id-1],id); 
+    }else{
+        $('#time').html("Time Off");
+        // clearInterval(counter);
     }
     if (id === 1) {
     $('#prev').hide();
@@ -542,18 +381,17 @@
             count++;
         }
         }
-
+        
         const data={
             user_id:uid,
             totalQuestions:totalQuestions,
             attempted_questions:count,
             correct_questions:userScore,
             total_time_taken:totalTimetaken,
+            begin_date_time:dateTimeString
         };
-
+        
         localStorage.setItem("resultData",JSON.stringify(data));
-
-        //console.log(data);
 
         $.ajax({
         url:'<?php echo base_url().'index.php/Quiz/resultController'?>',
@@ -572,16 +410,13 @@
         console.log("request completed");
         }
     }); 
-
     $("#submitModal").show();
-
     });
 
     // Quit Quiz function starts here-----------------
 
     function quitQuiz(){
         console.log("quit quiz clicked");
-        // console.log(data);
         totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
 
         for (let i = 0; i < selectedAnswers.length; i++) {
@@ -598,6 +433,7 @@
             attempted_questions:count,
             correct_questions:userScore,
             total_time_taken:totalTimetaken,
+            begin_date_time:dateTimeString
         };
 
         $.ajax({
@@ -618,7 +454,6 @@
         }
     }); 
     localStorage.clear();
-
     }
 
     // Preview function starts here----------------
@@ -634,7 +469,9 @@
         $('#time').addClass('disabled');
         $('.options').addClass('disabled');
         $('#submit').hide();
+        $('#view-result').show();
         showQuestions(id);
+        // startTimer(timeValues[id-1],id);
     }
 
     // ViewResult function starts here----------------
@@ -648,7 +485,6 @@
         $("#viewResultModal").show();
         $('#viewResultModal').removeClass('fade');
         const resultData=JSON.parse(localStorage.getItem("resultData"));
-        // console.log(resultData);
         $('#userid').html(resultData.user_id);
         $('#total-questions').html(resultData.totalQuestions);
         $('#attempted-questions').html(resultData.attempted_questions);
@@ -657,7 +493,6 @@
     }
 
     //Quiz App is initialized here----------------
-
     initializeApp();
     
 </script>
