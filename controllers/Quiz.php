@@ -2,7 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Quiz extends CI_Controller {
-
 	public function __construct(){
         parent::__construct();
         $this->load->model("Quiz_model");
@@ -25,18 +24,25 @@ class Quiz extends CI_Controller {
 	}
 
 	public function resultController(){
-		$data=array(
+		
+		$dataTest=array(
 		'user_id' => $this->input->post('user_id'),
         'total_questions' => $this->input->post('totalQuestions'),
         'attempted_questions' => $this->input->post('attempted_questions'),
         'correct_questions' => $this->input->post('correct_questions'),
         'total_time_taken' => $this->input->post('total_time_taken'),
-        'begin_date_time' => $this->input->post('begin_date_time')
+        'begin_date_time' => $this->input->post('begin_date_time'),
+		'options_selected' => json_encode($this->input->post('options_selected')),
+		'questions_text' => json_encode($this->input->post('question_text')),
+		'correct_answers' => json_encode($this->input->post('correct_ans')),
+		'time_storage' => json_encode($this->input->post('time_storage')),
 		);
 
-		$id=$this->Quiz_model->userResultInsert($data);
+		$id=$this->Quiz_model->userTestResultInsert($dataTest);
 
+		if($id){
 		echo json_encode("success");
+		}
 	}
 
 	public function logout(){
@@ -45,5 +51,4 @@ class Quiz extends CI_Controller {
     $this->session->set_flashdata("success","You are logged out successfully!!");
     redirect('RegisterController');
 	}
-
 }

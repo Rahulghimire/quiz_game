@@ -13,10 +13,23 @@ class Admin extends CI_Controller {
 
     public function index(){
       $rows=$this->Quiz_model->getUserResult();
-      // var_dump($rows);
       $data['rows']=$rows;
 		  $this->load->view("AdminDashboard",$data);
 	}
+
+  public function getPreviewResult($test_id){
+    $data=$this->Quiz_model->getPreviewData($test_id);
+    echo json_encode($data);
+  }
+
+  public function showUserDashboard(){
+    $this->load->view("UserResultView");
+  }
+
+  public function showUserResult($id){
+    $data=$this->Quiz_model->getResultForAUser($id);
+    echo json_encode($data);
+  }
 
     public function logout(){
         $this->session->sess_destroy();
@@ -24,5 +37,4 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata("success","You are logged out successfully!!");
         redirect('AdminController');
         }
-
 }

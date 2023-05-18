@@ -40,7 +40,7 @@
                   <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Please register to continue</h5>
                   <div class="form-outline mb-2">
                     <small class="text-danger"><?php echo form_error("name")?></small>
-                    <input type="text" id="name" class="form-control form-control-lg" name="name" placeholder="Ram Kumar Phuyal" value=""/>
+                    <input type="text" id="name" class="form-control form-control-lg" name="name" placeholder="Tom Hardy" value=""/>
                     <label class="form-label" for="form2Example17">Enter Username</label>
                   </div>
 

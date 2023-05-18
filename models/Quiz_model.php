@@ -9,7 +9,7 @@
     public function getUsers($data){
         $this->db->where('email',$data['email']);
         $this->db->where('password',$data['password']);
-        $this->db->where('role','admin');
+        // $this->db->where('role','admin');
         $this->db->from('users');
         $this->db->limit(1);
         $query=$this->db->get();
@@ -34,19 +34,42 @@
         return $query->result_array();
         }
     }
-    public function userResultInsert($data){
-        $this->db->insert('user_result', $data);
-        return $this->db->insert_id();
-    }
 
     //For Admindashboard Only
     public function getUserResult(){
-        $this->db->select('user_result.test_id, user_result.total_questions,user_result.user_id,user_result.attempted_questions, user_result.correct_questions, user_result.begin_date_time, user_result.total_time_taken, users.name');
-        $this->db->from('user_result');
-        $this->db->join('users', 'user_result.user_id = users.id');
+        $this->db->select('test_result.test_id,test_result.total_questions,test_result.test_id,test_result.attempted_questions, test_result.correct_questions, test_result.begin_date_time, test_result.total_time_taken, users.name');
+        $this->db->from('test_result');
+        $this->db->join('users', 'test_result.user_id = users.id');
         $query = $this->db->get();    
         if($query){
             return $query->result_array();
+        }
+    }
+
+    public function userTestResultInsert($data){
+        $this->db->insert('test_result', $data);
+        return $this->db->insert_id();
+    }
+
+    public function getPreviewData($id){
+        $this->db->select('*');
+        $this->db->from('test_result');
+        $this->db->where('test_id',$id);
+        $query = $this->db->get();
+        if($query){
+            return $query->result_array();
+        }
+    }
+
+    //For User Dashboard Only
+    public function getResultForAUser($id){
+        $this->db->select('*');
+        $this->db->from('test_result');
+        $this->db->where('user_id',$id);
+        $query = $this->db->get();
+        if($query){
+            return $result = $query->result_array();
+            // var_dump($result);
         }
     }
 

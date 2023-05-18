@@ -96,27 +96,25 @@
   </div>
 </div>
 <!-- ------------View Result Modal ends here---------- -->
-</body>
 
 <script>
     var previewStatus=false;
-    let totalQuestions=4;
-    let timeValue =  10;
-    var isCorrectAnswerSelected = false;
-    let totalTimetaken;
-    let count = 0;
-    let uid;
-    var dateTimeString;
-    let timeValues=new Array(totalQuestions).fill(10);
-    let userScore = 0;
     let counter;
     let timeLeft;
+    let totalTimetaken;
+    let uid;
+    var dateTimeString;
+    let totalQuestions=10;
+    let timeValue =  15;
+    let count = 0;
+    let index=0;
+    let timeValues=new Array(totalQuestions).fill(15);
+    let userScore = 0;
     let id=1;
     let selectedAnswers=new Array(totalQuestions).fill(0);
     let correctAnswers=new Array(totalQuestions).fill(0);
     let questions=new Array(totalQuestions).fill(0);
     console.log(selectedAnswers);
-    let index=0;
     var timeStorage=new Array(totalQuestions).fill(0);
 
     const next=document.querySelector("#next");
@@ -136,7 +134,9 @@
         dataType:'json',
         success:function(response){
         console.log(response);
+        if(response){
         localStorage.setItem('data'+id,JSON.stringify(response));
+        }
         showQuestions(id);
         },
 
@@ -170,10 +170,7 @@
     $('#view-result').hide();
     $('#prev').hide();
     $('#logout').hide();
-    
     generateBeginDateTime();
-    console.log(dateTimeString);
-
     var data = localStorage.getItem('data' + id);
     if(data) {
         showQuestions(1);
@@ -193,13 +190,9 @@
         options=JSON.parse(data[index].options);
         questions[id-1]=data[index].question_text;
         correctAnswers[id-1]=data[index].correct_answer;
-
         console.log("correct answer",correctAnswers);
         console.log("question",questions);
-
-
         $('#count').html(data[index].q_id);
-
         $('#que-text').html(data[index].question_text);
 
         for(i=0;i<options.length;i++){
@@ -251,15 +244,13 @@
     if (answer) {
         selectedAnswers[id - 1] = answer;
         console.log(selectedAnswers);
-        if (answer == corrAns && !isCorrectAnswerSelected) {
+        if (answer == corrAns) {
         userScore += 1;
-        isCorrectAnswerSelected = true;
         }
     }
     }
 
     // Timer function starts here----------------
-
     function startTimer(time,id){
     timeLeft = time;
     $("#time").html(time);
@@ -267,7 +258,7 @@
             $('.options').addClass('disabled');
             $("#time").html("Time Off");
         }
-    counter=setInterval(timer,1000);
+    counter=setInterval(timer,900);
     function timer(){
         if (timeLeft === 0){
             $('.options').addClass('disabled');
@@ -289,9 +280,9 @@
         }
     }
 }
+    // Timer function ends here----------------
 
     // Next function starts here----------------
-
     next.addEventListener("click",function(){
         clearInterval(counter);
         timeStorage[id-1]=timeValue-timeLeft;
@@ -326,9 +317,9 @@
             $('#option-'+selectedOption).addClass('selected');
     }
     });
+    // Next function ends here---------------------
 
     // Previous function starts here----------------
-
     prev.addEventListener("click",function(){
     timeValues[id-1]=timeLeft;
     timeStorage[id-1]=timeValue-timeLeft;
@@ -340,9 +331,8 @@
     startTimer(timeValues[id-1],id); 
     }else{
         $('#time').html("Time Off");
-        // clearInterval(counter);
     }
-    if (id === 1) {
+    if(id === 1) {
     $('#prev').hide();
     } else {
         $('#prev').show();
@@ -357,8 +347,65 @@
             console.log("selected option::",selectedOption);
             $('#option-'+selectedOption).addClass('selected');
     }
-
     });
+
+    // Previous function ends here----------------
+
+    //Send data to server function starts here
+
+    function sendDataToServer() {
+    const totalTimetaken = timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
+
+    for (let i = 0; i < selectedAnswers.length; i++) {
+        if (selectedAnswers[i] !== 0) {
+        count++;
+        }
+    }
+
+    const userId = parseInt($("#user-id").text());
+
+    const data = {
+        user_id: userId,
+        totalQuestions: totalQuestions,
+        attempted_questions: count,
+        correct_questions: userScore,
+        total_time_taken: totalTimetaken,
+        begin_date_time: dateTimeString,
+        options_selected: selectedAnswers,
+        question_text: questions,
+        correct_ans: correctAnswers,
+        time_storage: timeStorage
+        };
+        console.log(data);
+
+        localStorage.setItem("resultData",JSON.stringify(data));
+
+        $.ajax({
+            url: '<?php echo base_url().'index.php/Quiz/resultController'?>',
+            type: 'post',
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+            console.log(response);
+            },
+            error: function() {
+            console.log("error");
+            },
+            complete: function() {
+            console.log("request completed");
+            }
+        });
+        }
+
+    function quitQuiz() {
+    console.log("quit quiz clicked");
+    $("#quit-quiz").prop("disabled", true); 
+    sendDataToServer();
+    localStorage.clear();
+    }
+    
+    //Send data to server function ends here
+
 
     // Submit function starts here----------------
 
@@ -367,94 +414,14 @@
         console.log("submit button clicked");
         console.log(id);
         timeStorage[id-1]=timeValue-timeLeft;
-        localStorage.setItem("timeValues", JSON.stringify(timeValues));
-        localStorage.setItem("timeStorage",JSON.stringify(timeStorage));
-        localStorage.setItem("selectedAnswers",JSON.stringify(selectedAnswers));
         $("#userscore").html(userScore);
         var userId = $("#user-id").text();
         console.log(userId);
         uid = parseInt(userId);
-        totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
-       
-        for (let i = 0; i < selectedAnswers.length; i++) {
-        if (selectedAnswers[i] !== 0) {
-            count++;
-        }
-        }
-        
-        const data={
-            user_id:uid,
-            totalQuestions:totalQuestions,
-            attempted_questions:count,
-            correct_questions:userScore,
-            total_time_taken:totalTimetaken,
-            begin_date_time:dateTimeString
-        };
-        
-        localStorage.setItem("resultData",JSON.stringify(data));
-
-        $.ajax({
-        url:'<?php echo base_url().'index.php/Quiz/resultController'?>',
-        type:'post',
-        data:data,
-        dataType:'json',
-        success:function(response){
-        console.log(response);
-        },
-
-        error:function(){
-        console.log("error");
-        },
-
-        complete:function(){
-        console.log("request completed");
-        }
-    }); 
-    $("#submitModal").show();
+        sendDataToServer();
+        $("#submitModal").show();
     });
 
-    // Quit Quiz function starts here-----------------
-
-    function quitQuiz(){
-        console.log("quit quiz clicked");
-        totalTimetaken=timeStorage.reduce((accumulator, currentValue) => accumulator + currentValue);
-
-        for (let i = 0; i < selectedAnswers.length; i++) {
-        if (selectedAnswers[i] !== 0) {
-            count++;
-        }
-        }
-        var userId = $("#user-id").text();
-        uid = parseInt(userId);
-
-        const data={
-            user_id:uid,
-            totalQuestions:totalQuestions,
-            attempted_questions:count,
-            correct_questions:userScore,
-            total_time_taken:totalTimetaken,
-            begin_date_time:dateTimeString
-        };
-
-        $.ajax({
-        url:'<?php echo base_url().'index.php/Quiz/resultController'?>',
-        type:'post',
-        data:data,
-        dataType:'json',
-        success:function(response){
-        console.log(response);
-        },
-
-        error:function(){
-        console.log("error");
-        },
-
-        complete:function(){
-        console.log("request completed");
-        }
-    }); 
-    localStorage.clear();
-    }
 
     // Preview function starts here----------------
 
@@ -466,7 +433,7 @@
         $('#quit-quiz').hide();
         $('#logout').show();
         // clearInterval(counter);
-        $('#time').addClass('disabled');
+        // $('#time').addClass('disabled');
         $('.options').addClass('disabled');
         $('#submit').hide();
         $('#view-result').show();
@@ -485,15 +452,17 @@
         $("#viewResultModal").show();
         $('#viewResultModal').removeClass('fade');
         const resultData=JSON.parse(localStorage.getItem("resultData"));
+        if(resultData){
         $('#userid').html(resultData.user_id);
         $('#total-questions').html(resultData.totalQuestions);
         $('#attempted-questions').html(resultData.attempted_questions);
         $('#correct-questions').html(resultData.correct_questions);
         $('#total-timetaken').html(resultData.total_time_taken);
+        }  
     }
 
     //Quiz App is initialized here----------------
     initializeApp();
-    
 </script>
+</body>
 </html>

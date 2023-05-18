@@ -5,73 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include('header-1.php'); ?>
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo base_url().'assets/styles/admin-dash.css'?>">
     <title>Admin Dashboard</title>
-    <style>
-      *{
-        margin:0;
-        padding:0;
-        box-sizing: border-box;
-	      font-family: "Roboto", sans-serif;
-      }
-      .navbar
-      {
-          background:#00796B;
-          border-bottom-color: #004D40;
-      }
-      li{
-        list-style: none;
-        padding:0 10px;
-      }
-
-      a{
-        text-decoration:none;
-        color:white;
-      }
-
-    a:hover{
-      color:white;
-    }
-
-    .zindex{
-          z-index: 1;
-          width:30%;
-          position: absolute;
-          top:0;
-          left:0;
-    }
-
-    .table {
-    font-size: 14px;
-    border-radius: 2px;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  }
-
-  .table thead th {
-  background-color: #007bff;
-  color: #fff;
-  font-weight: 600;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.table th {
-    vertical-align: middle;
-    text-align: center;
-}
-
-.table tbody td {
-  text-align: center;
-  vertical-align: middle;
-}
-.modal-header{
-  border:none;
-}
-.modal-footer{
-  border:none;
-}
-</style>
 </head>
 <body>
 <?php
@@ -82,7 +17,7 @@
 }
 ?> 
 <nav class="navbar justify-content-between">
-  <a class="navbar-brand text-white fw-bold">Dashboard</a>
+  <a class="navbar-brand text-white fw-bold">Admin Dashboard</a>
   <form class="form-inline">
   <li><a  href="#"><i class="fa fa-user-circle"></i> Admin <span class="caret"></span></a></li>
   <li><a href="<?php base_url()?>Admin/logout"><i class="fa fa-sign-out"></i> Logout</a></li>  
@@ -132,26 +67,19 @@
         </button>
       </div>
       <div class="modal-body">
-      <table class="table">
+      <table class="table table-bordered table-hover">
   <thead class="thead-dark">
     <tr>
-      <th scope="col">User Id</th>
+      <th scope="col">SN</th>
       <th scope="col">Questions</th>
       <th scope="col">Selected Answers</th>
+      <th scope="col">Correct Answers</th>
+      <th scope="col">Time Taken</th>
     </tr>
   </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-    </tr>
-  
+  <tbody id="table-body">
   </tbody>
 </table>
-      </div>
-      <div class="modal-footer border-none">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -159,33 +87,65 @@
 
 <script>
 
-  // $(document).ready(function(){
-  //   console.log("Yes ready");
-  //   $.ajax({
-  //       url:'<?php echo base_url().'index.php/Admin/'?>',
-  //       type:'post',
-  //       data:{},
-  //       dataType:'json',
-  //       success:function(response){
-  //       console.log(response);
-  //       },
+setTimeout(function() {
+    $('.alert').alert('close');
+  }, 1200);
 
-  //       error:function(){
-  //       console.log("error");
-  //       },
-
-  //       complete:function(){
-  //       console.log("request completed");
-  //       }
-  //   });
-
-  // });
-  
   function showPreview(id){
+    $('#table-body').empty();
       console.log(id);
+      $.ajax({
+        url:'<?php echo base_url().'index.php/Admin/getPreviewResult/'?>'+id,
+        type:'post',
+        dataType:'json',
+          success: function(response) {
+          console.log(response.rows);
+          var tableBody = $('#table-body');
+
+          if (response) {
+            for (let i = 0; i < response[0].total_questions; i++) {
+              var optionsSelected = JSON.parse(response[0].options_selected);
+              var correctAnswers = JSON.parse(response[0].correct_answers);
+              var timeStorage = JSON.parse(response[0].time_storage);
+              var questionsText = JSON.parse(response[0].questions_text);
+              console.log(correctAnswers, questionsText);
+
+              var row = $('<tr>');
+              var question = questionsText[i];
+              var option = optionsSelected[i];
+              var corrAns = correctAnswers[i];
+              var time = timeStorage[i];
+
+              var timeString = time + ' secs';
+
+              if (option == corrAns && option != 0) {
+                row.addClass('bg-success text-white');
+              } else if (option != corrAns) {
+                row.addClass('bg-danger text-white');
+              } else {
+                row.addClass('bg-secondary text-white');
+              }
+              if(question!=0){
+              row.append($('<td>').text(i+1));
+              row.append($('<td>').text(question));
+              row.append($('<td>').text(option));
+              row.append($('<td>').text(corrAns));
+              row.append($('<td>').text(timeString));
+              tableBody.append(row);
+              }
+            }
+          }
+        },
+        error:function(){
+        console.log("error");
+        },
+
+        complete:function(){
+        console.log("request completed");
+        }
+      });
     }
 
 </script>
-
 </body>
 </html>

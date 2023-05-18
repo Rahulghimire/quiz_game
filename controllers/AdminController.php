@@ -18,31 +18,43 @@
         if($this->form_validation->run()===false){
             $this->index();
         }
-
         else{
+
             $data=array(
                 'email'=>$this->input->post('email'),
                 'password'=>md5($this->input->post("password")),
-                'role'=>'admin'
             );
 
             $result=$this->Quiz_model->getUsers($data);
+            // var_dump($result);
 
             if($result){
-
+            if($result->role=='admin'){
                 $auth_user=[
                     'id'=>$result->id,
                     'name'=>$result->name,
-                    'email'=>$result->email,
                 ];
 
                 $this->session->set_userdata('auth_admin',$auth_user);
                 $this->session->set_flashdata("success","Logged In Successfully");
-              redirect('Admin');   
+              redirect('Admin');  
+            }
+            else{
+                $auth_user=[
+                    'id'=>$result->id,
+                    'name'=>$result->name,
+                    'email'=>$result->email,
+                    'role'=>$result->role
+                ];
+                $this->session->set_userdata('auth_admin',$auth_user);
+                $this->session->set_flashdata("success","Logged In Successfully");
+              redirect('Admin/showUserDashboard');  
+            }
+                 
             }
 
             else{
-            $this->session->set_flashdata("failed","Invalid Credentials");
+            $this->session->set_flashdata("failed","These credentials do not match our records.");
             $this->index();
             }
 

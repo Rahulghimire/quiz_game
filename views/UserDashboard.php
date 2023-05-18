@@ -86,10 +86,12 @@
 </body>
 
 <script>
+  
+setTimeout(function() {
+    $('.alert').alert('close');
+  },1200);
 
     //For user signup
-
-
     function start(){
         $(document).ready(function(){
             $.ajax({
@@ -137,7 +139,6 @@
     }
   }, 100);
 });
-
 </script>
 
 </html>

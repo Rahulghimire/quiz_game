@@ -27,7 +27,6 @@
   background-color: #f5f5f5;
 }
 </style>
-
 <tr>
     <th scope="row">1</th>
       <td>Mark</td>
