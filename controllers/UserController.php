@@ -2,19 +2,11 @@
  class UserController extends CI_Controller{
 
     public function index(){
-        // $name=$this->input->post("name");
-
         $data['name']="admin";
         $data['email']="admin@gmail.com";
 
         var_dump($data);
 
-
-        // $data=array(
-        //     'email'=>$this->input->post('email'),
-        //     'password'=>md5($this->input->post("password")),
-        //     'role'=>'admin'
-        // );
 
         $this->db->select('id');
         $this->db->from('users');
@@ -44,13 +36,6 @@
         $data['email']="";
         $data['password']="";
 
-
-        // $data=array(
-        //     'email'=>$this->input->post('email'),
-        //     'password'=>md5($this->input->post("password")),
-        //     'role'=>'admin'
-        // );
-
         $this->db->select('id');
         $this->db->from('users');
         $this->db->where($data);
@@ -64,3 +49,28 @@
         } 
     }
  }
+
+ $email = "hari@gmail.com";
+$this->db->select('id');
+$this->db->from('users');
+$this->db->where('email', $email);
+$query = $this->db->get();
+
+
+if ($query->num_rows() > 0) {
+    $user_ids = $query->result_array();
+    $user_ids = array_column($user_ids, 'id');
+} else {
+}
+
+$this->db->select('*');
+$this->db->from('test_result');
+$this->db->where_in('user_id', $user_ids);
+$query = $this->db->get();
+
+if ($query->num_rows() > 0) {
+    $test_results = $query->result_array();
+} else {
+}
+
+

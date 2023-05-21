@@ -97,6 +97,8 @@
 </div>
 <!-- ------------View Result Modal ends here---------- -->
 
+    <!-- <script src="<?php echo base_url().'assets/QuizView.js'?>"></script> -->
+
 <script>
     var previewStatus=false;
     let counter;
@@ -143,7 +145,7 @@
         error:function(){
         console.log("error");
         },
-
+        
         complete:function(){
         console.log("request completed");
         }

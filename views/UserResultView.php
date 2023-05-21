@@ -24,7 +24,7 @@
       margin: 0;
       padding: 0;
     }
-    #userId{
+    #emailId{
         display:none;
     }
     </style>
@@ -33,9 +33,9 @@
     <?php  $user=$this->session->userdata('auth_admin');
         $name=$user['name'];
         $id=$user['id'];
+        $email=$user['email'];
         ?>
-        <p id="userId"><?php echo $id?></p>
-
+        <p id="emailId"><?php echo $email?></p>
         <body id="page-top">
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -57,7 +57,7 @@
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="#">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>User Dashboard</span></a
           >
@@ -113,23 +113,11 @@
             aria-labelledby="headingPages"
             data-parent="#accordionSidebar"
           >
-            <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Login Screens:</h6>
-              <a class="collapse-item" href="login.html">Login</a>
-              <a class="collapse-item" href="register.html">Register</a>
-              <a class="collapse-item" href="forgot-password.html"
-                >Forgot Password</a
-              >
-              <div class="collapse-divider"></div>
-              <h6 class="collapse-header">Other Pages:</h6>
-              <a class="collapse-item" href="404.html">404 Page</a>
-              <a class="collapse-item" href="blank.html">Blank Page</a>
-            </div>
           </div>
         </li>
         <!-- Nav Item - Charts -->
         <li class="nav-item">
-          <a class="nav-link" href="charts.html">
+          <a class="nav-link" href="#" id="chartsLink" data-toggle="modal" data-target="#chartModal">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Charts</span></a
           >
@@ -137,7 +125,7 @@
 
         <!-- Nav Item - Tables -->
         <li class="nav-item">
-          <a class="nav-link" href="tables.html">
+          <a class="nav-link" href="#">
             <i class="fas fa-fw fa-table"></i>
             <span>Tables</span></a
           >
@@ -259,14 +247,6 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                   </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
-                  </a>
                   <div class="dropdown-divider"></div>
                   <a
                     class="dropdown-item"
@@ -291,13 +271,13 @@
             <div
               class="d-sm-flex align-items-center justify-content-between mb-4"
             >
-              <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-              <a
+              <h1 class="h3 mb-0 text-gray-800">User Dashboard</h1>
+              <!-- <a
                 href="#"
                 class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
                 ><i class="fas fa-download fa-sm text-white-50"></i> Generate
                 Report</a
-              >
+              > -->
             </div>
 
             <!-- Content Row -->
@@ -311,21 +291,21 @@
                         <div
                           class="text-xs font-weight-bold text-primary text-uppercase mb-1"
                         >
-                          Total Time Taken
+                          Total Time In Quiz
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                          <span id="total-time"></span><span> secs</span>
+                          <span id="total-time"></span>
                         </div>
                       </div>
                       <div class="col-auto">
-                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        <i class="fas fa-clock fa-1x text-gray-300"></i>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Total Qns Card-->
+              <!-- Total Attempted Card-->
               <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-success shadow h-100 py-2">
                   <div class="card-body">
@@ -334,21 +314,20 @@
                         <div
                           class="text-xs font-weight-bold text-success text-uppercase mb-1"
                         >
-                          Total Questions
+                          Total Attempted 
                         </div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800 total-questions">
-                          $215,000
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"id="total-attempted-questions">
                         </div>
                       </div>
                       <div class="col-auto">
-                        <i class="fa fa-question-circle fa-2x text-gray-300"></i>
+                        <i class="fa fa-question-circle fa-1x text-gray-300"></i>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Corrected/Attempted Card -->
+              <!-- Correct Card -->
               <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-info shadow h-100 py-2">
                   <div class="card-body">
@@ -357,17 +336,16 @@
                         <div
                           class="text-xs font-weight-bold text-info text-uppercase mb-1"
                         >
-                          Correct / Attempted 
+                          Total Correct 
                         </div>
                         <div class="row no-gutters align-items-center">
-                          <div class="col">
-                          <span id="correct-questions"></span><span>/</span><span id="attempted-questions"></span>
+                          <div class="col h5 mb-0 font-weight-bold text-gray-800" id="correct-questions">
                           </div>
                         </div>
                       </div>
                       <div class="col-auto">
                         <i
-                          class="fas fa-clipboard-list fa-2x text-gray-300"
+                          class="fas fa-clipboard-list fa-1x text-gray-300"
                         ></i>
                       </div>
                     </div>
@@ -375,23 +353,23 @@
                 </div>
               </div>
 
-              <!--  Total Percentage Card-->
+              <!--  Ratio Card-->
               <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-warning shadow h-100 py-2">
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
                         <div
-                          class="text-xs font-weight-bold text-warning text-uppercase mb-1"
+                          class="text-xs font-weight-bold text-white text-uppercase mb-1"
                         >
-                         Total Percentage
+                         Ratio
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                          <span class="total-percentage"></span><span> %</span>
+                        <span class="text-white"><span id="correct"></span> <span> / </span> <span id="attempted"></span></span>
                         </div>
                       </div>
                       <div class="col-auto">
-                        <i class="fas fa-percent fa-2x text-gray-300"></i>
+                        <i class="fas fa-percent fa-1x text-gray-300"></i>
                       </div>
                     </div>
                   </div>
@@ -403,7 +381,7 @@
 
             <div class="row">
               <!-- Area Chart -->
-              <div class="col-12">
+              <div class="col-9">
                 <div class="card shadow mb-4">
                   <!-- Card Header - Dropdown -->
                   <div
@@ -412,44 +390,14 @@
                     <h6 class="m-0 font-weight-bold text-primary">
                       User Quiz Table
                     </h6>
-                    <div class="dropdown no-arrow">
-                      <a
-                        class="dropdown-toggle"
-                        href="#"
-                        role="button"
-                        id="dropdownMenuLink"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        <i
-                          class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"
-                        ></i>
-                      </a>
-                      <div
-                        class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                        aria-labelledby="dropdownMenuLink"
-                      >
-                        <div class="dropdown-header">Dropdown Header:</div>
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#"
-                          >Something else here</a
-                        >
-                      </div>
-                    </div>
                   </div>
                   <!-- Card Body -->
                   <div class="card-body table-responsive">
-                    <table class="table table-hover table-bordered">
-                    <thead class="thead-dark">
+                    <table class="text-center table table-hover table-bordered">
+                    <thead class="thead-light">
                       <tr>
-                        <th scope="col">SN</th>
-                        <th scope="col">Questions</th>
-                        <th scope="col">Selected Answers</th>
-                        <th scope="col">Correct Answers</th>
-                        <th scope="col">Time Taken</th>
+                        <th scope="col">Test ID</th>
+                        <th scope="col">Action</th>
                       </tr>
                     </thead>
                     <tbody id="table-body">
@@ -510,9 +458,46 @@
       </div>
     </div>
 
+  <!-- ----- Preview Modal starts here------------- -->
+
+  <div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">SN</th>
+            <th scope="col">Questions</th>
+            <th scope="col">Selected Answers</th>
+            <th scope="col">Correct Answers</th>
+            <th scope="col">Time Taken</th>
+          </tr>
+        </thead>
+        <tbody id="test-table-body">
+        </tbody>
+        </table>
+        </div>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-labelledby="chartModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+      <canvas id="userChart" style="width:100%;max-width:700px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <!-- Bootstrap core JavaScript-->
     <script src="<?php echo base_url().'assets/admin_assets/vendor/jquery/jquery.min.js'?>"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="<?php echo base_url().'assets/admin_assets/vendor/jquery-easing/jquery.easing.min.js'?>"></script>
@@ -520,89 +505,245 @@
     <!-- Custom scripts for all pages-->
     <script src="<?php echo base_url().'assets/admin_assets/js/sb-admin-2.min.js'?>"></script>
 
-    <!-- Page level plugins -->
-    <script src="<?php echo base_url().'assets/admin_assets/vendor/chart.js/Chart.min.js'?>"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="<?php echo base_url().'assets/admin_assets/js/demo/chart-area-demo.js'?>"></script>
-    <script src="<?php echo base_url().'assets/admin_assets/js/demo/chart-pie-demo.js'?>"></script>
-
         <script>
-            var id=$('#userId').text();
-            // console.log(typeof(uid));
-      
+        let emailId=$('#emailId').text();
+        var correct=0;
+        var time=0;
+        var attempt=0;
+        var data;
+
         $.ajax({
-            url:'<?php echo base_url().'index.php/Admin/showUserResult/'?>'+id,
-            type:'json',
-            data:{},
-            dataType: 'json',
+            url:'<?php echo base_url().'index.php/Admin/showUserResult'?>',
+            method:'POST',
+            data:{email:emailId},
+            dataType:'json',
             success: function(response) {
             var tableBody = $('#table-body');
+            console.log(response);
+            data=response;
+
             if(response){
-            var data=response[0];
-            $('#total-time').html(data.total_time_taken);
-            const correctQuestions=data.correct_questions;
-            const attemptedQuestions=data.attempted_questions;
-
-            $('.total-questions').html(data.total_questions);
-            $('#correct-questions').html(correctQuestions);
-            $('#attempted-questions').html(attemptedQuestions);
-            const c=parseInt(correctQuestions);
-            const a=parseInt(attemptedQuestions);
-            const percentage=(c/a)*100;
-            console.log(percentage);
-
-            $('.total-percentage').html(percentage);
-
-            var optionsSelected = JSON.parse(data.options_selected);
-            var correctAnswers = JSON.parse(data.correct_answers);
-            var timeStorage = JSON.parse(data.time_storage);
-            var questionsText = JSON.parse(data.questions_text);
-
-            for (let i = 0; i < data.total_questions; i++) {
-              var optionsSelected = JSON.parse(response[0].options_selected);
-              var correctAnswers = JSON.parse(response[0].correct_answers);
-              var timeStorage = JSON.parse(response[0].time_storage);
-              var questionsText = JSON.parse(response[0].questions_text);
-              console.log(correctAnswers, questionsText);
-
-              var row = $('<tr>');
-              var question = questionsText[i];
-              var option = optionsSelected[i];
-              var corrAns = correctAnswers[i];
-              var time = timeStorage[i];
-
-              var timeString = time + ' secs';
-
-              if (option == corrAns && option != 0) {
-                row.addClass('bg-success text-white');
-              } else if (option != corrAns) {
-                row.addClass('text-danger');
-              } else {
-                row.addClass('text-success');
-              }
-              if(question!=0){
-              row.append($('<td>').text(i+1));
-              row.append($('<td>').text(question));
-              row.append($('<td>').text(option));
-              row.append($('<td>').text(corrAns));
-              row.append($('<td>').text(timeString));
-              // tableBody.DataTable();
-              tableBody.append(row);
-              }
-            }
+              totalTimeInQuiz(response);
+              totalAttemptedQuestions(response);
+              totalCorrectQuestions(response);
+              calculateRatio(response);
+              appendDataInUserTable(response);
             }
             },
-
             error:function(error){
                 console.log(error);
             },
-
             complete:function(){
                 console.log("request completed");
             }
         });
-       
-        </script>
+
+        function totalAttemptedQuestions(response){
+          for(let i=0;i<response.length;i++){
+            attempt+=parseInt(response[i].attempted_questions);
+          }
+          $('#total-attempted-questions').html(attempt);
+        }
+        
+        function totalTimeInQuiz(response){
+          for(let i=0;i<response.length;i++){
+            time+=parseInt(response[i].total_time_taken);
+          }
+
+          var hours = Math.floor(time / 3600);
+          var minutes = Math.floor((time % 3600) / 60);
+          var seconds = Math.floor(time % 60);
+          var formattedTime = hours + "hr " + minutes + "min " + seconds + "sec";
+          $('#total-time').html(formattedTime);
+        }
+
+        function totalCorrectQuestions(response){
+          for(let i=0;i<response.length;i++){
+            correct+=parseInt(response[i].correct_questions);
+          }
+          $("#correct-questions").html(correct);
+        }
+
+        function calculateRatio(response){
+          var percent=(correct/attempt)*100;
+          if(percent<50){
+            $('.border-left-warning').addClass("bg-danger");
+          }
+          else if(percent>=50&&percent<80){
+            $('.border-left-warning').addClass("bg-warning");
+          }
+          else{
+            $('.border-left-warning').addClass("bg-success");
+          }
+          $('#correct').html(correct);
+          $('#attempted').html(attempt);
+        }
+
+        function appendDataInUserTable(response){
+          var tableBody = $('#table-body');
+          for(let i=0;i<response.length;i++){
+            var row = $('<tr>');
+            var id = response[i].test_id;
+            row.append($('<td>').text(id));
+
+            var button = $('<button>').attr({
+            type: 'button',
+            class: 'btn btn-info',
+            'data-toggle': 'modal',
+            'data-target': '#previewModal',
+            onclick: 'viewResult(' + id + ')',
+          }).text('View Result');
+          var buttonCell = $('<td>').append(button);
+          row.append(buttonCell);
+          tableBody.append(row);
+            
+          }
+        } 
+
+        function viewResult(id){
+        $('#test-table-body').empty();
+        $.ajax({
+          url:'<?php echo base_url().'index.php/Admin/getPreviewResult/'?>'+id,
+          method:'post',
+          dataType:'json',
+            success: function(response) {
+            console.log("inside view result",response);
+            var tableBody = $('#test-table-body');
+
+            if (response) {
+              for (let i = 0; i < response[0].total_questions; i++) {
+                var optionsSelected = JSON.parse(response[0].options_selected);
+                var correctAnswers = JSON.parse(response[0].correct_answers);
+                var timeStorage = JSON.parse(response[0].time_storage);
+                var questionsText = JSON.parse(response[0].questions_text);
+                console.log(correctAnswers, questionsText);
+
+                var row = $('<tr>');
+                var question = questionsText[i];
+                var option = optionsSelected[i];
+                var corrAns = correctAnswers[i];
+                var time = timeStorage[i];
+
+                var timeString = time + ' secs';
+
+                if (option == corrAns && option != 0) {
+                  row.addClass('bg-success text-white');
+                } else if (option != corrAns) {
+                  row.addClass('text-danger');
+                } else {
+                  row.addClass('bg-secondary text-white');
+                }
+                if(question!=0){
+                row.append($('<td>').text(i+1));
+                row.append($('<td>').text(question));
+                row.append($('<td>').text(option));
+                row.append($('<td>').text(corrAns));
+                row.append($('<td>').text(timeString));
+                tableBody.append(row);
+                }
+              }
+            }
+          },
+          error:function(){
+          console.log("error");
+          },
+          complete:function(){
+          console.log("request completed");
+          }
+        });
+        }
+
+      document.getElementById("chartsLink").addEventListener("click", function() {
+
+        const testIds = data.map(test => parseInt(test.test_id));
+        const correctQuestions = data.map(test => parseInt(test.correct_questions));
+        const incorrectQuestions = data.map(test => parseInt(test.attempted_questions)-parseInt(test.correct_questions));
+
+        new Chart("userChart", {
+        type: "line",
+        data: {
+          labels: data.map(test => "Test " + parseInt(test.test_id)),
+          datasets: [{
+            label: "Correct Answers",
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            borderColor: "rgba(144, 238, 144, 1)",
+            pointBackgroundColor: "rgba(144, 238, 144, 1)",
+            pointBorderColor: "#fff",
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            data: correctQuestions
+          },
+          {
+            label: "Incorrect Answers",
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            borderColor: "rgba(255, 99, 132, 1)", // Red color for incorrect answers
+            pointBackgroundColor: "rgba(255, 99, 132, 1)",
+            pointBorderColor: "#fff",
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            data: incorrectQuestions
+          }]
+        },
+        options: {
+          title: {
+            display: true,
+            text: "Test Results",
+            fontSize: 18,
+            fontColor: "#333"
+          },
+          legend: {
+            display: true,
+            labels: {
+              fontColor: "#333",
+              fontSize: 12
+            }
+          },
+          scales: {
+            xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: "Test ID"
+              },
+              ticks: {
+                fontSize: 12,
+                fontColor: "#777"
+              },
+              gridLines: {
+                color: "rgba(0, 0, 0, 0.1)"
+              }
+            }],
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: "Answers"
+              },
+              ticks: {
+                min: 0,
+                max: 10,
+                stepSize: 2,
+                fontSize: 12,
+                fontColor: "#777"
+              },
+              gridLines: {
+                color: "rgba(0, 0, 0, 0.1)"
+              }
+            }]
+          },
+          tooltips: {
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            titleFontSize: 14,
+            titleFontColor: "#fff",
+            bodyFontSize: 12,
+            bodyFontColor: "#fff"
+          }
+        }
+      }); 
+      });
+
+      </script>
 </body>
 </html>

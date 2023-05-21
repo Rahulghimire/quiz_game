@@ -46,7 +46,7 @@
                     <span class="h1 fw-bold mb-0">Logo</span>
                   </div>
 
-                  <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Login into admin account</h5>
+                  <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Login into your account</h5>
 
                   <div class="form-outline mb-2">
                     <small class="text-danger"><?php echo form_error("name")?></small>

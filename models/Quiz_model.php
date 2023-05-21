@@ -62,14 +62,35 @@
     }
 
     //For User Dashboard Only
-    public function getResultForAUser($id){
+    // public function getResultForAUser($id){
+    //     $this->db->select('*');
+    //     $this->db->from('test_result');
+    //     $this->db->where('user_id',$id);
+    //     $query = $this->db->get();
+    //     if($query){
+    //         return $result = $query->result_array();
+    //         // var_dump($result);
+    //     }
+    // }
+
+    public function getResultForAUser($email){
+        $this->db->select('id');
+        $this->db->from('users');
+        $this->db->where('email',$email);
+        $query = $this->db->get();
+
+        if($query->num_rows() > 0) {
+            $user_ids = $query->result_array();
+            $user_ids = array_column($user_ids, 'id');
+        }
+        
         $this->db->select('*');
         $this->db->from('test_result');
-        $this->db->where('user_id',$id);
+        $this->db->where_in('user_id', $user_ids);
         $query = $this->db->get();
-        if($query){
-            return $result = $query->result_array();
-            // var_dump($result);
+
+        if ($query->num_rows() > 0) {
+            return $test_results = $query->result();
         }
     }
 

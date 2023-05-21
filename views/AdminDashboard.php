@@ -60,12 +60,6 @@
 <div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title border-none" id="previewModalLongTitle"></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
       <div class="modal-body">
       <table class="table table-bordered table-hover">
   <thead class="thead-dark">
@@ -99,7 +93,6 @@ setTimeout(function() {
         type:'post',
         dataType:'json',
           success: function(response) {
-          console.log(response.rows);
           var tableBody = $('#table-body');
 
           if (response) {
@@ -121,7 +114,7 @@ setTimeout(function() {
               if (option == corrAns && option != 0) {
                 row.addClass('bg-success text-white');
               } else if (option != corrAns) {
-                row.addClass('bg-danger text-white');
+                row.addClass('text-danger');
               } else {
                 row.addClass('bg-secondary text-white');
               }

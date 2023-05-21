@@ -26,8 +26,9 @@ class Admin extends CI_Controller {
     $this->load->view("UserResultView");
   }
 
-  public function showUserResult($id){
-    $data=$this->Quiz_model->getResultForAUser($id);
+  public function showUserResult(){
+    $email=$this->input->post('email');
+    $data=$this->Quiz_model->getResultForAUser($email);
     echo json_encode($data);
   }
 

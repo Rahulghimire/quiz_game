@@ -13,7 +13,7 @@ class RegisterController extends CI_Controller{
     public function register(){
         $this->form_validation->set_rules('name','Name','required|min_length[4]|max_length[20]|regex_match[/^[a-zA-Z0-9 ]+$/]|trim');
         $this->form_validation->set_rules('email','Email','trim|required|valid_email');
-        $this->form_validation->set_rules('password','Password','trim|required');
+        $this->form_validation->set_rules('password','Password','trim|min_length[4]|max_length[14]|required');
 
         if($this->form_validation->run()===false){
             $this->index();
